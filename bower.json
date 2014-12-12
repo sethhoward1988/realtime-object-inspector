@@ -1,9 +1,9 @@
 {
-  "name": "realtime-playground",
+  "name": "realtime-object-inspector",
   "version": "0.0.0",
-  "homepage": "https://github.com/googledrive/realtime-playground",
-  "authors": "Google Drive Realtime API authors",
-  "description": "Polymer-powered Google Drive Realtime Playground",
+  "homepage": "https://github.com/sethhoward1988/realtime-playground",
+  "authors": "Seth Howard",
+  "description": "Polymer-powered Google Drive Realtime Playground Object Inspector",
   "main": "components/elements/playground-app.html",
   "keywords": [
     "playground",

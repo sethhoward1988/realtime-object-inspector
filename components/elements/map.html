@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-icons/image-icons.html">
+<link rel="import" href="../core-icon-button/core-icon-button.html">
+
+<link rel="import" href="string.html">
+<link rel="import" href="list.html">
+
+<polymer-element name="collab-map" attributes="map">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+        background-color: green;
+        padding: 0px;
+      }
+      :host > collab-map,
+      :host > collab-list,
+      :host > collab-string {
+        padding: 20px;
+      }
+
+      .key {
+        width: 150px;
+      }
+
+      .value {
+
+      }
+
+      .key, .value {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      #id {
+        font-style: italic;
+      }
+
+      #expandIcon {
+        transition: all .2s;
+      }
+
+      #expandIcon.collapse {
+        transition: all .2s;
+        transform: rotate(-90deg)
+      }
+
+      .hidden {
+        display: none;
+      }
+
+    </style>
+    <div>
+    </div>
+    <div class="meta-data">
+      <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <span id="type">Collaborative Map</span>
+      <span id="id"></span>
+    </div>
+    <div id="content" class="hidden"></div>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing Map');
+      },
+
+      mapChanged: function () {
+        // this.empty();
+        this.$.id.innerText = this.map.id;
+        var keys = this.map.keys();
+        for(var i = 0; i < keys.length; i++){
+          if(this.map.get(keys[i]).keys){
+            this.createMap(keys[i], this.map.get(keys[i]));
+          } else if (this.map.get(keys[i]).getText){
+            this.createString(keys[i], this.map.get(keys[i]));
+          } else if (this.map.get(keys[i]).push){
+            this.createList(keys[i], this.map.get(keys[i]));
+          }
+        }
+      },
+
+      createKeyValue: function (key, el) {
+        var containerEl = document.createElement('div');
+        var keyEl = document.createElement('div');
+        keyEl.classList.add('key');
+        var valueEl = document.createElement('div');
+        valueEl.classList.add('value');
+        containerEl.appendChild(keyEl);
+        containerEl.appendChild(valueEl);
+        valueEl.appendChild(el);
+        keyEl.innerText = key;
+        return containerEl;
+      },
+
+      createMap: function (key, collabMap) {
+        var map = document.createElement('collab-map');
+        this.$.content.appendChild(this.createKeyValue(key,map));
+        map.map = collabMap;
+      },
+
+      createString: function (key, collabString) {
+        var string = document.createElement('collab-string');
+        this.$.content.appendChild(this.createKeyValue(key, string));
+        string.string = collabString;
+        
+      },
+
+      createList: function (key, collabList) {
+        var list = document.createElement('collab-list');
+        this.$.content.appendChild(this.createKeyValue(key, list));
+        list.list = collabList;
+      },
+
+      toggleExpand: function () {
+        this.$.expandIcon.classList.toggle('collapse');
+        this.$.content.classList.toggle('hidden');
+      }
+    });
+  </script>
+</polymer-element>

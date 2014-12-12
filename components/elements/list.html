@@ -1,0 +1,25 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="string.html">
+<link rel="import" href="map.html">
+
+<polymer-element name="collab-list" attributes="list">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+      }
+    </style>
+    <h3>Collaborative List</h3>
+    <content></content>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing List');
+      }
+    });
+  </script>
+</polymer-element>

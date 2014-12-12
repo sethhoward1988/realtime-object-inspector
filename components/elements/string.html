@@ -1,0 +1,28 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<polymer-element name="collab-string" attributes="string">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+      }
+    </style>
+    <span>Collaborative String</span>
+    <input id="stringInput" type="text" value="{{ val }}"></input>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing String');
+      },
+
+      stringChanged: function () {
+        this.val = this.string.getText();
+        // this.$.stringInput.value = this.string.getText();
+      }
+
+    });
+  </script>
+</polymer-element>

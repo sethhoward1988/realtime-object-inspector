@@ -1,6 +1,9 @@
 html,body {
   height: 100%;
   margin: 0;
-  background-color: #3f51b5;
   font-family: 'RobotoDraft', sans-serif;
+}
+
+collab-map > collab-map {
+	padding: 20px;
 }

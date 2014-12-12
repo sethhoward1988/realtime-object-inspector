@@ -1,0 +1,61 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="doc.html">
+
+<polymer-element name="inspector-app">
+  <template>
+      App Here;
+      <collab-doc id="docEl"></map>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing Document');
+        window.util = new Utils();
+        var token = util.getParam('access_token');
+        var fileId = util.getParam('id');
+        var that = this;
+
+        window.gapi.load('auth:client,drive-realtime,drive-share', {
+          callback:  function() {
+            this.loadedDoc = null;
+            console.log('loaded success');
+            gapi.auth.setToken({access_token:token});            
+            that.registerTypes();
+            window.gapi.drive.realtime.load(
+              fileId,
+              function(doc){
+                console.log('loading file...');
+                that.$.docEl.doc = doc;
+                // that.$.docEl.docChanged();
+              }, function(){
+                throw new Error;
+              }, function (e) {
+                console.log('Error!');
+            });
+          }
+        });
+      },
+
+      registerTypes: function () {
+            // Register Types Here
+            var Movie = function () {};
+            Movie.prototype = {
+              initialize: function (name, director) {
+                this.name = name;
+                this.director = director;
+                this.notes = '';
+                this.rating = '';
+              }
+            }
+
+            var custom = gapi.drive.realtime.custom;
+            custom.registerType(Movie, 'DemoMovie');
+            Movie.prototype.name = custom.collaborativeField('name');
+            Movie.prototype.director = custom.collaborativeField('director');
+            Movie.prototype.notes = custom.collaborativeField('notes');
+            Movie.prototype.rating = custom.collaborativeField('rating');
+            custom.setInitializer(Movie, Movie.prototype.initialize);
+          }
+    });
+  </script>
+</polymer-element>

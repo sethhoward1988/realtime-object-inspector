@@ -1,4 +1,4 @@
-application: realtimeplayground
+application: realtime-inspector
 version: 1
 runtime: python27
 api_version: 1
@@ -22,22 +22,9 @@ handlers:
   static_dir: vendor
   secure: always
 
-- url: /tests
-  static_dir: tests
-  secure: always
-
-- url: /test
-  static_files: templates/test.html
-  upload: templates/test.html
-  secure: always
-
 - url: /
-  static_files: templates/playground.html
-  upload: templates/playground.html
-  secure: always
-
-- url: .*
-  script: redirect.app
+  static_files: templates/index.html
+  upload: templates/index.html
   secure: always
 
 skip_files:
