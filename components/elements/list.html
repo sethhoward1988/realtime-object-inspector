@@ -2,6 +2,7 @@
 
 <link rel="import" href="string.html">
 <link rel="import" href="map.html">
+<link rel="import" href="json.html">
 
 <polymer-element name="collab-list" attributes="list">
   <template>
@@ -10,15 +11,115 @@
         display: block;
         position: relative;
         width: 100%;
+        padding: 0px;
+      }
+      :host > collab-map,
+      :host > collab-list,
+      :host > collab-string {
+        padding: 20px;
+      }
+
+      .key {
+        width: 150px;
+      }
+
+      .value {
+
+      }
+
+      .key, .value {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      #id {
+        font-style: italic;
+      }
+
+      #expandIcon {
+        transition: all .2s;
+      }
+
+      #expandIcon.collapse {
+        transition: all .2s;
+        transform: rotate(-90deg)
+      }
+
+      .hidden {
+        display: none;
       }
     </style>
-    <h3>Collaborative List</h3>
+    <div class="meta-data">
+      <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <span id="type">Collaborative List</span>
+      <span id="id"></span>
+    </div>
+    <div id="content" class="hidden"></div>
     <content></content>
   </template>
   <script>
     Polymer({
       ready: function () {
         console.log('Initializing List');
+      },
+
+      listChanged: function () {
+        // this.empty();
+        console.log('list changed');
+        this.$.id.innerText = this.list.id;
+        var listItems = this.list.asArray();
+        for(var i = 0; i < listItems.length; i++){
+          if(typeof listItems[i] === 'object'){
+            if(listItems[i].keys){
+              this.createMap(listItems[i]);
+            } else if (listItems[i].getText){
+              this.createString(listItems[i]);
+            } else if (listItems[i].push){
+              this.createList(listItems[i]);
+            } else {
+              this.createJsonValue(listItems[i]);  
+            }
+          } else {
+            this.createJsonValue(listItems[i]);
+          }
+          
+        }
+      },
+
+      createValue: function (value) {
+        var containerEl = document.createElement('div');
+        containerEl.appendChild(value);
+        return containerEl;
+      },
+
+      createMap: function (key, collabMap) {
+        var map = document.createElement('collab-map');
+        this.$.content.appendChild(this.createKeyValue(map));
+        map.map = collabMap;
+      },
+
+      createString: function (key, collabString) {
+        var string = document.createElement('collab-string');
+        this.$.content.appendChild(this.createKeyValue(string));
+        string.string = collabString;
+        
+      },
+
+      createList: function (key, collabList) {
+        var list = document.createElement('collab-list');
+        this.$.content.appendChild(this.createKeyValue(list));
+        list.list = collabList;
+      },
+
+      createJsonValue: function (value) {
+        var jsonValue = document.createElement('json-value');
+        this.$.content.appendChild(this.createValue(jsonValue));
+        jsonValue.value = value;
+      },
+
+      toggleExpand: function () {
+        this.$.expandIcon.classList.toggle('collapse');
+        this.$.content.classList.toggle('hidden');
       }
     });
   </script>

@@ -1,0 +1,26 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<polymer-element name="json-value" attributes="value">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+      }
+    </style>
+    <span>Json Value</span>
+    <input id="stringInput" type="text" value="{{ value }}"></input>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing String');
+      },
+
+      valueChanged: function () {
+      }
+
+    });
+  </script>
+</polymer-element>

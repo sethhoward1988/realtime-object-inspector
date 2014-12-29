@@ -12,7 +12,6 @@
         display: block;
         position: relative;
         width: 100%;
-        background-color: green;
         padding: 0px;
       }
       :host > collab-map,
@@ -78,7 +77,13 @@
             this.createString(keys[i], this.map.get(keys[i]));
           } else if (this.map.get(keys[i]).push){
             this.createList(keys[i], this.map.get(keys[i]));
+          } else {
+            this.createJsonValue(keys[i], this.map.get(keys[i]));
           }
+        }
+
+        if(!keys.length){
+          this.$.content.appendChild(this.createKeyValue('Empty', document.createElement('div')));
         }
       },
 
@@ -112,6 +117,12 @@
         var list = document.createElement('collab-list');
         this.$.content.appendChild(this.createKeyValue(key, list));
         list.list = collabList;
+      },
+
+      createJsonValue: function (key, value) {
+        var jsonValue = document.createElement('json-value');
+        this.$.content.appendChild(this.createKeyValue(key, jsonValue));
+        jsonValue.value = value;
       },
 
       toggleExpand: function () {
