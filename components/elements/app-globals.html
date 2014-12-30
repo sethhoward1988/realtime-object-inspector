@@ -1,0 +1,22 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<polymer-element name="app-globals">
+  <script>
+  (function(){
+
+    Polymer({
+        ready: function () {
+          console.log('globals ready!');
+        },
+
+        setDoc: function (doc) {
+          this.doc = doc;
+        },
+
+        getDoc: function () {
+          return this.doc;
+        }
+      });
+  })();
+  </script>
+</polymer-element>

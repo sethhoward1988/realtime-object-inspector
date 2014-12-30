@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="editable-cell.html">
 
-<polymer-element name="collab-string" attributes="string">
+<polymer-element name="collab-string" attributes="value">
   <template>
     <style>
       :host {
@@ -10,7 +11,7 @@
       }
     </style>
     <span>Collaborative String</span>
-    <input id="stringInput" type="text" value="{{ val }}"></input>
+    <editable-cell></editable-cell>
   </template>
   <script>
     Polymer({
@@ -19,8 +20,7 @@
       },
 
       stringChanged: function () {
-        this.val = this.string.getText();
-        // this.$.stringInput.value = this.string.getText();
+        this.val = this.value.getText();
       }
 
     });

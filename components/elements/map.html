@@ -1,11 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-icons/image-icons.html">
+<link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../core-icon-button/core-icon-button.html">
 
 <link rel="import" href="string.html">
 <link rel="import" href="list.html">
+<link rel="import" href="value-picker.html">
 
-<polymer-element name="collab-map" attributes="map">
+<polymer-element name="collab-map" attributes="value">
   <template>
     <style>
       :host {
@@ -59,27 +61,35 @@
       <span id="id"></span>
     </div>
     <div id="content" class="hidden"></div>
+    <div id="add">
+      <div class="key">
+        <paper-input id="newKey"></paper-input>
+      </div>
+      <value-picker id="picker"></value-picker>
+    </div>
   </template>
   <script>
     Polymer({
       ready: function () {
         console.log('Initializing Map');
+        this.$.picker.parent = this;
       },
 
       mapChanged: function () {
         // this.empty();
-        this.$.id.innerText = this.map.id;
-        var keys = this.map.keys();
+        this.$.id.innerText = this.value.id;
+        var keys = this.value.keys();
         for(var i = 0; i < keys.length; i++){
-          if(this.map.get(keys[i]).keys){
-            this.createMap(keys[i], this.map.get(keys[i]));
-          } else if (this.map.get(keys[i]).getText){
-            this.createString(keys[i], this.map.get(keys[i]));
-          } else if (this.map.get(keys[i]).push){
-            this.createList(keys[i], this.map.get(keys[i]));
+          if(this.value.get(keys[i]).keys){
+            type = 'collab-map';
+          } else if (this.value.get(keys[i]).getText){
+            type = 'collab-string';
+          } else if (this.value.get(keys[i]).push){
+            type = 'collab-list';
           } else {
-            this.createJsonValue(keys[i], this.map.get(keys[i]));
+            type = 'json-value';
           }
+          this.createKeyValue(keys[i], this.value.get(keys[i]), type)
         }
 
         if(!keys.length){
@@ -87,47 +97,50 @@
         }
       },
 
-      createKeyValue: function (key, el) {
+      createKeyValue: function (key, value, type) {
+        var el = document.createElement(type);
+        var that = this;
         var containerEl = document.createElement('div');
-        var keyEl = document.createElement('div');
+        var keyEl = document.createElement('editable-cell');
         keyEl.classList.add('key');
+        keyEl.data = {
+          type: 'key',
+          value: key,
+          map: this.value
+        }
         var valueEl = document.createElement('div');
         valueEl.classList.add('value');
+
+        var removeEl = document.createElement('core-icon');
+        removeEl.setAttribute('icon', 'lock-open');
+        removeEl.onclick = function () {
+          that.remove(key, containerEl)
+        }
+
         containerEl.appendChild(keyEl);
         containerEl.appendChild(valueEl);
+        containerEl.appendChild(removeEl);
+
         valueEl.appendChild(el);
-        keyEl.innerText = key;
         return containerEl;
       },
 
-      createMap: function (key, collabMap) {
-        var map = document.createElement('collab-map');
-        this.$.content.appendChild(this.createKeyValue(key,map));
-        map.map = collabMap;
-      },
-
-      createString: function (key, collabString) {
-        var string = document.createElement('collab-string');
-        this.$.content.appendChild(this.createKeyValue(key, string));
-        string.string = collabString;
-        
-      },
-
-      createList: function (key, collabList) {
-        var list = document.createElement('collab-list');
-        this.$.content.appendChild(this.createKeyValue(key, list));
-        list.list = collabList;
-      },
-
-      createJsonValue: function (key, value) {
-        var jsonValue = document.createElement('json-value');
-        this.$.content.appendChild(this.createKeyValue(key, jsonValue));
-        jsonValue.value = value;
+      remove: function (key, el) {
+        this.value.set(key, null);
+        el.parentNode.removeChild(el);
       },
 
       toggleExpand: function () {
         this.$.expandIcon.classList.toggle('collapse');
         this.$.content.classList.toggle('hidden');
+      },
+
+      add: function (el) {
+        if(!this.$.newKey.value){
+          alert('You must supply a key before selecting a new object');
+          return;
+        }
+        this.value.set(this.$.newKey.value, el.value)
       }
     });
   </script>

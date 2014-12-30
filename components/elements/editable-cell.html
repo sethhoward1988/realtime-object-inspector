@@ -1,0 +1,61 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input.html">
+
+<link rel="import" href="string.html">
+<link rel="import" href="list.html">
+
+<polymer-element name="editable-cell" attributes="data">
+  <template>
+    <style>
+      input {
+        border: none;
+        cursor: pointer;
+        height: 20px;
+      }
+
+      input.editing-true {
+        cursor: text;
+        padding-left: 2px;
+        font-style: italic;
+        border: 1px solid black;
+      }
+    </style>
+    <input class="editing-{{ isEditable }}" id="editableInput" on-click="{{ onMouseClick }}" on-blur="{{ onBlur }}" type="text" value="{{ data.value }}"></input>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing Map');
+      },
+
+      dataChanged: function () {
+        console.log('data has changed');
+        this.data.originalValue = this.data.value;
+      },
+
+      onMouseClick: function () {
+        this.isEditable = true;
+        var length = this.$.editableInput.value.length
+        this.$.editableInput.setSelectionRange(0, length);
+      },
+
+      onBlur: function () {
+        console.log('onBlur');
+        this.isEditable = false;
+        var value = this.$.editableInput.value;
+        this.persist();
+      },
+
+      persist: function () {
+        switch(this.data.type){
+          case 'key':
+            // key value for a map
+            var value = this.data.map.get(this.data.originalValue);
+            this.data.map.set(this.data.value, value);
+            this.data.map.set(this.data.originalValue, null);
+        }
+      }
+
+    });
+  </script>
+</polymer-element>

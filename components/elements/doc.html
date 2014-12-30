@@ -14,7 +14,7 @@
 
       docChanged: function () {
         console.log('doc has changed!');
-        this.$.mapEl.map = this.doc.getModel().getRoot();
+        this.$.mapEl.value = this.doc.getModel().getRoot();
         this.doesDocExist = !!this.doc;
       }
     });

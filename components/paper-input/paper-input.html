@@ -8,34 +8,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <!--
-
 Material Design: <a href="http://www.google.com/design/spec/components/text-fields.html#text-fields-single-line-text-field">Single line text field</a>
-
 `paper-input` is a single-line text field for user input. It is a convenience element composed of
 a `paper-input-decorator` and a `input is="core-input"`.
-
 Example:
-
     <paper-input label="Your Name"></paper-input>
-
 If you need more control over the `input` element, use `paper-input-decorator`.
-
 Theming
 -------
-
 `paper-input` can be styled similarly to `paper-input-decorator`.
-
 Form submission
 ---------------
-
 Unlike inputs using `paper-input-decorator` directly, `paper-input` does not work out of
 the box with the native `form` element. This is because the native `form` is not aware of
 shadow DOM and does not treat `paper-input` as a form element.
-
 Use `paper-input-decorator` directly, or see
 <a href="https://github.com/garstasio/ajax-form">`ajax-form`</a> for a possible solution
 to submitting a `paper-input`.
-
+Validation
+----------
+Use `paper-input-decorator` if you would like to implement validation.
 @group Paper Elements
 @element paper-input
 @homepage github.io
@@ -56,15 +48,13 @@ to submitting a `paper-input`.
   </style>
 
   <paper-input-decorator id="decorator" label="{{label}}" floatingLabel="{{floatingLabel}}" value="{{value}}" disabled?="{{disabled}}">
-    <input is="core-input" value="{{value}}" committedValue="{{committedValue}}" on-change="{{changeAction}}" disabled?="{{disabled}}">
+    <input is="core-input" id="input" value="{{value}}" committedValue="{{committedValue}}" on-change="{{changeAction}}" disabled?="{{disabled}}">
   </paper-input-decorator>
 
 </template>
 
 <script>
-
   Polymer('paper-input', {
-
     publish: {
       /**
        * The label for this input. It normally appears as grey text inside
@@ -75,7 +65,6 @@ to submitting a `paper-input`.
        * @default ''
        */
       label: '',
-
       /**
        * If true, the label will "float" above the text input once the
        * user enters text instead of disappearing.
@@ -85,7 +74,6 @@ to submitting a `paper-input`.
        * @default false
        */
       floatingLabel: false,
-
       /**
        * Set to true to style the element as disabled.
        *
@@ -94,26 +82,39 @@ to submitting a `paper-input`.
        * @default false
        */
       disabled: {value: false, reflect: true},
-
+      /**
+       * The current value of the input.
+       *
+       * @attribute value
+       * @type String
+       * @default ''
+       */
       value: '',
-
+      /**
+       * The most recently committed value of the input.
+       *
+       * @attribute committedValue
+       * @type String
+       * @default ''
+       */
       committedValue: ''
-
     },
-
+    /**
+     * Focuses the `input`.
+     *
+     * @method focus
+     */
+    focus: function() {
+      this.$.input.focus();
+    },
     valueChanged: function() {
       this.$.decorator.updateLabelVisibility(this.value);
     },
-
     changeAction: function(e) {
-      if (!window.ShadowDOMPolyfill) {
-        // re-fire event that does not bubble across shadow roots
-        this.fire('change', null, this);
-      }
+      // re-fire event that does not bubble across shadow roots
+      this.fire('change', null, this);
     }
-
   });
-
 </script>
 
 </polymer-element>

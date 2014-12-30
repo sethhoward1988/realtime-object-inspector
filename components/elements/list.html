@@ -4,7 +4,7 @@
 <link rel="import" href="map.html">
 <link rel="import" href="json.html">
 
-<polymer-element name="collab-list" attributes="list">
+<polymer-element name="collab-list" attributes="value">
   <template>
     <style>
       :host {
@@ -63,11 +63,11 @@
         console.log('Initializing List');
       },
 
-      listChanged: function () {
+      valueChanged: function () {
         // this.empty();
         console.log('list changed');
-        this.$.id.innerText = this.list.id;
-        var listItems = this.list.asArray();
+        this.$.id.innerText = this.value.id;
+        var listItems = this.value.asArray();
         for(var i = 0; i < listItems.length; i++){
           if(typeof listItems[i] === 'object'){
             if(listItems[i].keys){

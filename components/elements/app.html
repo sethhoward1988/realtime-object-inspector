@@ -1,8 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="doc.html">
+<link rel="import" href="app-globals.html">
 
 <polymer-element name="inspector-app">
   <template>
+      <app-globals id="globals"></app-globals>
       <collab-doc id="docEl"></map>
   </template>
   <script>
@@ -25,7 +27,7 @@
               function(doc){
                 console.log('loading file...');
                 that.$.docEl.doc = doc;
-                // that.$.docEl.docChanged();
+                that.$.globals.setDoc(doc);
               }, function(){
                 throw new Error;
               }, function (e) {
@@ -36,25 +38,25 @@
       },
 
       registerTypes: function () {
-            // Register Types Here
-            var Movie = function () {};
-            Movie.prototype = {
-              initialize: function (name, director) {
-                this.name = name;
-                this.director = director;
-                this.notes = '';
-                this.rating = '';
-              }
-            }
-
-            var custom = gapi.drive.realtime.custom;
-            custom.registerType(Movie, 'DemoMovie');
-            Movie.prototype.name = custom.collaborativeField('name');
-            Movie.prototype.director = custom.collaborativeField('director');
-            Movie.prototype.notes = custom.collaborativeField('notes');
-            Movie.prototype.rating = custom.collaborativeField('rating');
-            custom.setInitializer(Movie, Movie.prototype.initialize);
+        // Register Types Here
+        var Movie = function () {};
+        Movie.prototype = {
+          initialize: function (name, director) {
+            this.name = name;
+            this.director = director;
+            this.notes = '';
+            this.rating = '';
           }
+        }
+
+        var custom = gapi.drive.realtime.custom;
+        custom.registerType(Movie, 'DemoMovie');
+        Movie.prototype.name = custom.collaborativeField('name');
+        Movie.prototype.director = custom.collaborativeField('director');
+        Movie.prototype.notes = custom.collaborativeField('notes');
+        Movie.prototype.rating = custom.collaborativeField('rating');
+        custom.setInitializer(Movie, Movie.prototype.initialize);
+      }
     });
   </script>
 </polymer-element>
