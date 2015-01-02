@@ -43,6 +43,7 @@
 
       #expandIcon {
         transition: all .2s;
+        cursor: pointer;
       }
 
       #expandIcon.collapse {
@@ -70,6 +71,10 @@
 
       .remove {
         float: left;
+      }
+
+      .item-container {
+        padding: 3px;
       }
 
     </style>
@@ -130,6 +135,7 @@
         var el = document.createElement(type);
         var that = this;
         var containerEl = document.createElement('div');
+        containerEl.classList.add('item-container');
         var keyEl = document.createElement('editable-cell');
         keyEl.classList.add('key');
         keyEl.data = {

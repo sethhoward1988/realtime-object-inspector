@@ -7,10 +7,20 @@
 <polymer-element name="editable-cell" attributes="data">
   <template>
     <style>
+      :host {
+        padding-right: 5px;
+      }
+
       input {
         border: none;
         cursor: pointer;
         height: 20px;
+        border: 1px solid transparent;
+        padding-left: 5px;
+      }
+
+      input:hover {
+        border: 1px dashed black;
       }
 
       input.editing-true {

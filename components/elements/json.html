@@ -22,7 +22,7 @@
           value: this.value,
           parent: this.parent
         }
-        if(this.parent.keys){
+        if(this.parent && this.parent.keys){
           // It's on a map
           base.type = 'json-map';
           base.key = this.key;

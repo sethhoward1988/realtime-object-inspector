@@ -34,6 +34,7 @@
 
       #expandIcon {
         transition: all .2s;
+        cursor: pointer;
       }
 
       #expandIcon.collapse {
@@ -57,7 +58,7 @@
 
       .splitter {
         width: 100px;
-        height: 25px;
+        height: 0px;
         border: 1px dashed black;
       }
     </style>
@@ -129,6 +130,7 @@
         containerEl.ondragend = this.onDragEnd;
         containerEl.ondragenter = this.onDragEnter;
         containerEl.ondragover = this.onDragOver;
+        containerEl.setAttribute('index', index);
 
         var valueEl = document.createElement('div');
         valueEl.classList.add('value');
@@ -189,13 +191,12 @@
 
       // DRAGGING OPERATIONS
 
-      onDragStart: function (event) {
+      onDragStart: function (evt) {
         event.dataTransfer.effectAllowed = 'copy';
-        console.log('drag has started...');
       },
 
-      onDragEnd: function () {
-        this.removeSeparator();
+      onDragEnd: function (evt) {
+        this.move(evt);
       },
 
       onDragOver: function (evt) {
@@ -215,26 +216,23 @@
 
       insertSeparator: function (evt) {
         var middle = evt.currentTarget.clientHeight / 2;
-        if(evt.offsetY > middle){
+        if(evt.offsetY > middle - 5){
           // insert separator below
-          if(!evt.currentTarget.nextSibling || evt.currentTarget.nextSibling.tagName != 'SEPARATOR'){
-              evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget.nextSibling);
-          }
-          
-          if(evt.currentTarget.previousSibling && evt.currentTarget.previousSibling.tagName == 'SEPARATOR'){
-            evt.currentTarget.parentNode.removeChild(evt.currentTarget.previousSibling);
-          }
+          evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget.nextSibling);
 
         } else {
           // insert separator above
-          if(!evt.currentTarget.previousSibling || evt.currentTarget.previousSibling.tagName != 'SEPARATOR'){
-            evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget);
-          }
-            
-          if(evt.currentTarget.nextSibling && evt.currentTarget.nextSibling.tagName == 'SEPARATOR'){
-            evt.currentTarget.parentNode.removeChild(evt.currentTarget.nextSibling);
-          }
+          evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget);
         }
+      },
+
+      move: function (evt) {
+        var startIndex = parseInt(evt.target.getAttribute('index'));
+        var beforeSeparatorIndex = parseInt(this.separator.previousSibling ? this.separator.previousSibling.getAttribute('index') : 0);
+        var afterSeparatorIndex = parseInt(this.separator.nextSibling ? this.separator.nextSibling.getAttribute('index') : beforeSeparatorIndex + 1);
+        console.log('moving ' + startIndex + ' to ' + afterSeparatorIndex);
+        this.value.move(startIndex, afterSeparatorIndex);
+        this.removeSeparator();
       },
 
       getSeparator: function () {
@@ -245,8 +243,8 @@
         return this.separator;
       },
 
-      removeSeparator: function (evt) {
-        
+      removeSeparator: function () {
+        this.separator = null;
       }
 
     });
