@@ -10,8 +10,18 @@
 <polymer-element name="value-picker" attributes="parent">
   <template>
     <style>
+      :host {
+        position: absolute;
+        z-index: 10;
+        background-color: white;
+        margin-left: 25px;
+      }
       paper-shadow {
         width: 200px;
+      }
+      paper-item:hover {
+        background-color: steelblue;
+        color: white;
       }
     </style>
     <app-globals id="globals"></app-globals>
@@ -25,17 +35,20 @@
   </template>
   <script>
     Polymer({
+      ready: function () {
+        console.log('Initializing value picker');
+      },
 
       onMapClick: function () {
-        this.create('collaborative-map', this.$.globals.doc.getModel().createMap());
+        this.create('collaborative-map', this.$.globals.getModel().createMap());
       },
 
       onListClick: function () {
-        this.create('collaborative-list', this.$.globals.doc.getModel().createString());
+        this.create('collaborative-list', this.$.globals.getModel().createList());
       },
 
       onStringClick: function () {
-        this.create('collaborative-string', this.$.globals.doc.getModel().createString());
+        this.create('collaborative-string', this.$.globals.getModel().createString());
       },
 
       onJsonValueClick: function () {

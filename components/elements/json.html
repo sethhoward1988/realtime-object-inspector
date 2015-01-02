@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<polymer-element name="json-value" attributes="value">
+<polymer-element name="json-value" attributes="value parent key index">
   <template>
     <style>
       :host {
@@ -9,17 +9,35 @@
         width: 100%;
       }
     </style>
-    <span>Json Value</span>
-    <input id="stringInput" type="text" value="{{ value }}"></input>
+    <editable-cell id="editableCell"></editable-cell>
   </template>
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing String');
+        console.log('Initializing Json Value');
       },
 
       valueChanged: function () {
-      }
+        var base = {
+          value: this.value,
+          parent: this.parent
+        }
+        if(this.parent.keys){
+          // It's on a map
+          base.type = 'json-map';
+          base.key = this.key;
+        } else {
+          // It's on a list
+          base.type= 'json-list'
+          base.index = this.index 
+        }
+        this.$.editableCell.data = base;
+      },
+
+      toggleExpand: function () {
+        this.$.expandIcon.classList.toggle('collapse');
+        this.$.content.classList.toggle('hidden');
+      },
 
     });
   </script>

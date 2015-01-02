@@ -20,12 +20,12 @@
         border: 1px solid black;
       }
     </style>
-    <input class="editing-{{ isEditable }}" id="editableInput" on-click="{{ onMouseClick }}" on-blur="{{ onBlur }}" type="text" value="{{ data.value }}"></input>
+    <input class="editing-{{ isEditable }}" id="editableInput" placeholder="empty" on-click="{{ onMouseClick }}" on-blur="{{ onBlur }}" type="text" value="{{ data.value }}"></input>
   </template>
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing Map');
+        console.log('Initializing Editable Cell');
       },
 
       dataChanged: function () {
@@ -43,6 +43,9 @@
         console.log('onBlur');
         this.isEditable = false;
         var value = this.$.editableInput.value;
+        if(value === this.data.originalValue){
+          return;
+        }
         this.persist();
       },
 
@@ -51,8 +54,18 @@
           case 'key':
             // key value for a map
             var value = this.data.map.get(this.data.originalValue);
-            this.data.map.set(this.data.value, value);
             this.data.map.set(this.data.originalValue, null);
+            this.data.map.set(this.data.value, value);
+            break;
+          case 'string':
+            this.data.string.text = this.data.value;
+            break;
+          case 'json-map':
+            this.data.parent.set(this.data.key, this.data.value);
+            break;
+          case 'json-list':
+            this.data.parent.set(this.data.index, this.data.value);
+            break;
         }
       }
 

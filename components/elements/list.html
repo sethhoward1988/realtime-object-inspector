@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-drag-drop/core-drag-drop.html">
 
 <link rel="import" href="string.html">
 <link rel="import" href="map.html">
@@ -19,17 +20,12 @@
         padding: 20px;
       }
 
-      .key {
-        width: 150px;
+      #content {
+        padding: 0px 0px 10px 30px;
       }
 
       .value {
-
-      }
-
-      .key, .value {
         display: inline-block;
-        vertical-align: top;
       }
 
       #id {
@@ -48,79 +44,211 @@
       .hidden {
         display: none;
       }
+
+      .add-item {
+        transition: all .3s;
+        vertical-align: top;
+      }
+
+      .add-item.close {
+        transition: all .3s;
+        transform: rotate(45deg);
+      }
+
+      .splitter {
+        width: 100px;
+        height: 25px;
+        border: 1px dashed black;
+      }
     </style>
     <div class="meta-data">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
       <span id="type">Collaborative List</span>
       <span id="id"></span>
     </div>
-    <div id="content" class="hidden"></div>
-    <content></content>
+    <div id="content" class="hidden">
+      <div id="listItems"></div>
+      <div id="add">
+        <core-icon class="add-item {{ isClosed }}" on-click="{{ toggleAdd }}" icon="add"></core-icon>
+        <value-picker hidden?="{{ !isClosed }}" id="picker"></value-picker>
+      </div>
+    </div>
   </template>
   <script>
     Polymer({
       ready: function () {
         console.log('Initializing List');
+        this.$.picker.parent = this;
+        this.valueChanged = this.valueChanged.bind(this);
+        this.setBindings();
+
+
+      },
+
+      setBindings: function () {
+        this.onDragStart = this.onDragStart.bind(this);
+        this.onDragEnd = this.onDragEnd.bind(this);
+        this.onDragOver = this.onDragOver.bind(this);
+        this.onDragEnter = this.onDragEnter.bind(this);
       },
 
       valueChanged: function () {
-        // this.empty();
-        console.log('list changed');
-        this.$.id.innerText = this.value.id;
-        var listItems = this.value.asArray();
-        for(var i = 0; i < listItems.length; i++){
-          if(typeof listItems[i] === 'object'){
-            if(listItems[i].keys){
-              this.createMap(listItems[i]);
-            } else if (listItems[i].getText){
-              this.createString(listItems[i]);
-            } else if (listItems[i].push){
-              this.createList(listItems[i]);
-            } else {
-              this.createJsonValue(listItems[i]);  
-            }
-          } else {
-            this.createJsonValue(listItems[i]);
+        this.setListener();
+        if(this.$.listItems.childNodes.length){
+          while (this.$.listItems.firstChild) {
+              this.$.listItems.removeChild(this.$.listItems.firstChild);
           }
-          
+        }
+        
+        this.$.id.innerText = this.value.id;
+        var arr = this.value.asArray();
+        for(var i = 0; i < arr.length; i++){
+          if(arr[i].keys){
+            type = 'collab-map';
+          } else if (arr[i].getText){
+            type = 'collab-string';
+          } else if (arr[i].push){
+            type = 'collab-list';
+          } else if (arr[i].referencedObject) {
+            type = 'index-reference';
+            console.log('new index reference!');
+          }else {
+            type = 'json-value';
+          }
+          this.createValue(i, arr[i], type)
         }
       },
 
-      createValue: function (value) {
-        var containerEl = document.createElement('div');
-        containerEl.appendChild(value);
-        return containerEl;
-      },
-
-      createMap: function (key, collabMap) {
-        var map = document.createElement('collab-map');
-        this.$.content.appendChild(this.createKeyValue(map));
-        map.map = collabMap;
-      },
-
-      createString: function (key, collabString) {
-        var string = document.createElement('collab-string');
-        this.$.content.appendChild(this.createKeyValue(string));
-        string.string = collabString;
+      createValue: function (index, value, type) {
+        var el = document.createElement(type);
+        var that = this;
         
+        var containerEl = document.createElement('div');
+        containerEl.setAttribute('draggable', 'true');
+        containerEl.ondragstart = this.onDragStart;
+        containerEl.ondragend = this.onDragEnd;
+        containerEl.ondragenter = this.onDragEnter;
+        containerEl.ondragover = this.onDragOver;
+
+        var valueEl = document.createElement('div');
+        valueEl.classList.add('value');
+
+        var removeEl = document.createElement('core-icon');
+        removeEl.setAttribute('icon', 'delete');
+        removeEl.onclick = function () {
+          that.remove(index, containerEl)
+        }
+        
+        containerEl.appendChild(removeEl);
+        containerEl.appendChild(valueEl);
+
+        valueEl.appendChild(el);
+
+        el.parent = this.value;
+        if(type === 'json-value'){
+          el.index = index;
+        }
+        el.value = value;
+
+        this.$.listItems.appendChild(containerEl);
       },
 
-      createList: function (key, collabList) {
-        var list = document.createElement('collab-list');
-        this.$.content.appendChild(this.createKeyValue(list));
-        list.list = collabList;
+      remove: function (index, el) {
+        this.value.remove(index);
       },
 
-      createJsonValue: function (value) {
-        var jsonValue = document.createElement('json-value');
-        this.$.content.appendChild(this.createValue(jsonValue));
-        jsonValue.value = value;
+      setListener: function () {
+        if(!this.listenerSet){
+          this.value.addEventListener(gapi.drive.realtime.EventType.VALUES_ADDED, this.valueChanged);
+          this.value.addEventListener(gapi.drive.realtime.EventType.VALUES_REMOVED, this.valueChanged);
+          this.value.addEventListener(gapi.drive.realtime.EventType.VALUES_SET, this.valueChanged);
+          this.listenerSet = true;
+        }
       },
 
       toggleExpand: function () {
         this.$.expandIcon.classList.toggle('collapse');
         this.$.content.classList.toggle('hidden');
+        this.isClosed = '';
+      },
+
+      add: function (el) {
+        this.value.push(el.value);
+        this.isClosed = '';
+        this.valueChanged();
+      },
+
+      toggleAdd: function () {
+        if(!this.isClosed){
+          this.isClosed = 'close';
+        } else {
+          this.isClosed = '';
+        }
+      },
+
+
+      // DRAGGING OPERATIONS
+
+      onDragStart: function (event) {
+        event.dataTransfer.effectAllowed = 'copy';
+        console.log('drag has started...');
+      },
+
+      onDragEnd: function () {
+        this.removeSeparator();
+      },
+
+      onDragOver: function (evt) {
+        console.log('X:' + evt.offsetX + ' Y:' + evt.offsetY);
+        console.log(evt.currentTarget);
+        if(evt.target.value){
+          this.insertSeparator(evt);
+        }
+      },
+
+      onDragEnter: function (evt) {
+        console.log(evt.currentTarget);
+        if(evt.target.value){
+          this.insertSeparator(evt);
+        }
+      },
+
+      insertSeparator: function (evt) {
+        var middle = evt.currentTarget.clientHeight / 2;
+        if(evt.offsetY > middle){
+          // insert separator below
+          if(!evt.currentTarget.nextSibling || evt.currentTarget.nextSibling.tagName != 'SEPARATOR'){
+              evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget.nextSibling);
+          }
+          
+          if(evt.currentTarget.previousSibling && evt.currentTarget.previousSibling.tagName == 'SEPARATOR'){
+            evt.currentTarget.parentNode.removeChild(evt.currentTarget.previousSibling);
+          }
+
+        } else {
+          // insert separator above
+          if(!evt.currentTarget.previousSibling || evt.currentTarget.previousSibling.tagName != 'SEPARATOR'){
+            evt.currentTarget.parentNode.insertBefore(this.getSeparator(), evt.currentTarget);
+          }
+            
+          if(evt.currentTarget.nextSibling && evt.currentTarget.nextSibling.tagName == 'SEPARATOR'){
+            evt.currentTarget.parentNode.removeChild(evt.currentTarget.nextSibling);
+          }
+        }
+      },
+
+      getSeparator: function () {
+        if(!this.separator){
+          this.separator = document.createElement('div');
+          this.separator.classList.add('splitter');
+        }
+        return this.separator;
+      },
+
+      removeSeparator: function (evt) {
+        
       }
+
     });
   </script>
 </polymer-element>

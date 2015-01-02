@@ -2,21 +2,41 @@
 
 <polymer-element name="app-globals">
   <script>
-  (function(){
+    DocumentHolder = function () {}
+    DocumentHolder.prototype = {
+      getDoc: function () {
+        return this.doc;
+      },
+      setDoc: function (doc) {
+        this.doc = doc;
+      }
+    }
+  </script>
+  <script>
+  (function (d) {
+
+    var documentHolder = new d;
 
     Polymer({
-        ready: function () {
-          console.log('globals ready!');
-        },
+      ready: function () {
+        this.documentHolder = documentHolder;
+        console.log('globals ready!');
+      },
 
-        setDoc: function (doc) {
-          this.doc = doc;
-        },
+      setDoc: function (doc) {
+        this.documentHolder.setDoc(doc);
+      },
 
-        getDoc: function () {
-          return this.doc;
-        }
-      });
-  })();
+      getDoc: function () {
+        return this.documentHolder.getDoc();
+      },
+
+      getModel: function () {
+        return this.getDoc().getModel();
+      }
+      
+    });
+
+  })(DocumentHolder);
   </script>
 </polymer-element>

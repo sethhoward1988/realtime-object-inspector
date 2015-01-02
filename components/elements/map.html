@@ -6,6 +6,8 @@
 <link rel="import" href="string.html">
 <link rel="import" href="list.html">
 <link rel="import" href="value-picker.html">
+<link rel="import" href="json.html">
+<link rel="import" href="index-reference.html">
 
 <polymer-element name="collab-map" attributes="value">
   <template>
@@ -22,12 +24,12 @@
         padding: 20px;
       }
 
-      .key {
-        width: 150px;
+      #content {
+        padding: 0px 0px 10px 30px;
       }
 
-      .value {
-
+      .key {
+        width: 150px;
       }
 
       .key, .value {
@@ -52,6 +54,24 @@
         display: none;
       }
 
+      value-picker, paper-input {
+        display: inline-block;
+      }
+
+      .add-item {
+        transition: all .3s;
+        vertical-align: top;
+      }
+
+      .add-item.close {
+        transition: all .3s;
+        transform: rotate(45deg);
+      }
+
+      .remove {
+        float: left;
+      }
+
     </style>
     <div>
     </div>
@@ -60,12 +80,15 @@
       <span id="type">Collaborative Map</span>
       <span id="id"></span>
     </div>
-    <div id="content" class="hidden"></div>
-    <div id="add">
-      <div class="key">
-        <paper-input id="newKey"></paper-input>
+    <div id="content" class="hidden">
+      <div id="mapItems"></div>
+      <div id="add">
+        <core-icon class="add-item {{ isClosed }}" on-click="{{ toggleAdd }}" icon="add"></core-icon>
+        <div class="key" hidden?="{{ !isClosed }}">
+          <paper-input label="new key" id="newKey" value="{{ newKeyValue }}"></paper-input>
+        </div>
+        <value-picker hidden?="{{ !newKeyValue || !isClosed }}" id="picker"></value-picker>
       </div>
-      <value-picker id="picker"></value-picker>
     </div>
   </template>
   <script>
@@ -73,10 +96,17 @@
       ready: function () {
         console.log('Initializing Map');
         this.$.picker.parent = this;
+        this.valueChanged = this.valueChanged.bind(this);
       },
 
-      mapChanged: function () {
-        // this.empty();
+      valueChanged: function () {
+        this.setListener();
+        if(this.$.mapItems.childNodes.length){
+          while (this.$.mapItems.firstChild) {
+              this.$.mapItems.removeChild(this.$.mapItems.firstChild);
+          }
+        }
+        
         this.$.id.innerText = this.value.id;
         var keys = this.value.keys();
         for(var i = 0; i < keys.length; i++){
@@ -86,14 +116,13 @@
             type = 'collab-string';
           } else if (this.value.get(keys[i]).push){
             type = 'collab-list';
-          } else {
+          } else if (this.value.get(keys[i]).referencedObject) {
+            type = 'index-reference';
+            console.log('new index reference!');
+          }else {
             type = 'json-value';
           }
           this.createKeyValue(keys[i], this.value.get(keys[i]), type)
-        }
-
-        if(!keys.length){
-          this.$.content.appendChild(this.createKeyValue('Empty', document.createElement('div')));
         }
       },
 
@@ -112,17 +141,25 @@
         valueEl.classList.add('value');
 
         var removeEl = document.createElement('core-icon');
-        removeEl.setAttribute('icon', 'lock-open');
+        removeEl.setAttribute('icon', 'delete');
+        removeEl.classList.add('remove');
         removeEl.onclick = function () {
           that.remove(key, containerEl)
         }
 
+        containerEl.appendChild(removeEl);
         containerEl.appendChild(keyEl);
         containerEl.appendChild(valueEl);
-        containerEl.appendChild(removeEl);
 
         valueEl.appendChild(el);
-        return containerEl;
+
+        el.parent = this.value;
+        if(type === 'json-value'){
+          el.key = key;
+        }
+        el.value = value;
+
+        this.$.mapItems.appendChild(containerEl);
       },
 
       remove: function (key, el) {
@@ -130,9 +167,17 @@
         el.parentNode.removeChild(el);
       },
 
+      setListener: function () {
+        if(!this.listenerSet){
+          this.value.addEventListener(gapi.drive.realtime.EventType.VALUE_CHANGED, this.valueChanged);
+          this.listenerSet = true;
+        }
+      },
+
       toggleExpand: function () {
         this.$.expandIcon.classList.toggle('collapse');
         this.$.content.classList.toggle('hidden');
+        this.isClosed = '';
       },
 
       add: function (el) {
@@ -140,8 +185,20 @@
           alert('You must supply a key before selecting a new object');
           return;
         }
-        this.value.set(this.$.newKey.value, el.value)
+        this.value.set(this.$.newKey.value, el.value);
+        this.$.newKey.value = '';
+        this.isClosed = '';
+        this.valueChanged();
+      },
+
+      toggleAdd: function () {
+        if(!this.isClosed){
+          this.isClosed = 'close';
+        } else {
+          this.isClosed = '';
+        }
       }
+
     });
   </script>
 </polymer-element>
