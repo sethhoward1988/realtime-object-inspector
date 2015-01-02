@@ -26,6 +26,14 @@
         transition: all .2s;
         transform: rotate(-90deg)
       }
+
+      table td:first-child {
+        padding-right: 15px;
+      }
+
+      em {
+        font-style: italic;
+      }
     </style>
     <div class="meta-data">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
@@ -33,7 +41,20 @@
       <span id="id"></span>
     </div>
     <div id="content" class="hidden">
-      <editable-cell id="editableCell"></editable-cell>
+      <table>
+        <tr>
+          <td>index</td>
+          <td>{{ value.index }}</td>
+        </tr>
+        <tr>
+          <td>canBeDeleted</td>
+          <td>{{ value.canBeDeleted }} - <em>Read Only</em></td>
+        </tr>
+        <tr>
+          <td>referencedObject id</td>
+          <td>{{ value.referencedObject.id }} - <em>Read Only</em></td>
+        </tr>
+      </table>
     </div>
   </template>
   <script>
