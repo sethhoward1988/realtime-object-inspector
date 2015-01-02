@@ -4,72 +4,32 @@
 <link rel="import" href="string.html">
 <link rel="import" href="map.html">
 <link rel="import" href="json.html">
+<link rel="import" href="list-item.html">
 
 <polymer-element name="collab-list" attributes="value">
   <template>
     <style>
-      :host {
-        display: block;
-        position: relative;
-        width: 100%;
-        padding: 0px;
-      }
-      :host > collab-map,
-      :host > collab-list,
-      :host > collab-string {
-        padding: 20px;
-      }
-
-      #content {
-        padding: 0px 0px 10px 30px;
-      }
-
-      .value {
-        display: inline-block;
-      }
-
-      #id {
-        font-style: italic;
-      }
-
-      #expandIcon {
-        transition: all .2s;
-        cursor: pointer;
-      }
-
-      #expandIcon.collapse {
-        transition: all .2s;
-        transform: rotate(-90deg)
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      .add-item {
-        transition: all .3s;
-        vertical-align: top;
-      }
-
-      .add-item.close {
-        transition: all .3s;
-        transform: rotate(45deg);
-      }
-
       .splitter {
         width: 100px;
         height: 0px;
         border: 1px dashed black;
       }
+
+      div[draggable=true]:hover{
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
+        cursor: grab;
+      }
     </style>
-    <div class="meta-data">
+    <app-globals id="globals"></app-globals>
+    <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
-      <span id="type">Collaborative List</span>
-      <span id="id"></span>
+      <span class="type color-primary">Collaborative List</span>
+      <span class="color-tertiary">id="</span><span class="id color-secondary"></span><span class="color-tertiary">"</span>
     </div>
-    <div id="content" class="hidden">
+    <div id="content" hidden?="{{ contentHidden }}">
       <div id="listItems"></div>
-      <div id="add">
+      <div id="add" hidden?="{{ !globals.documentHolder.isEditable }}">
         <core-icon class="add-item {{ isClosed }}" on-click="{{ toggleAdd }}" icon="add"></core-icon>
         <value-picker hidden?="{{ !isClosed }}" id="picker"></value-picker>
       </div>
@@ -78,12 +38,11 @@
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing List');
+        this.globals = this.$.globals;
         this.$.picker.parent = this;
         this.valueChanged = this.valueChanged.bind(this);
+        this.contentHidden = true;
         this.setBindings();
-
-
       },
 
       setBindings: function () {
@@ -95,68 +54,29 @@
 
       valueChanged: function () {
         this.setListener();
+        this.shadowRoot.querySelector('.id').innerText = this.value.id;
+        if(!this.isOpened){
+          return;
+        }
+
         if(this.$.listItems.childNodes.length){
           while (this.$.listItems.firstChild) {
               this.$.listItems.removeChild(this.$.listItems.firstChild);
           }
         }
-        
-        this.$.id.innerText = this.value.id;
+
         var arr = this.value.asArray();
         for(var i = 0; i < arr.length; i++){
-          if(arr[i].keys){
-            type = 'collab-map';
-          } else if (arr[i].getText){
-            type = 'collab-string';
-          } else if (arr[i].push){
-            type = 'collab-list';
-          } else if (arr[i].referencedObject) {
-            type = 'index-reference';
-            console.log('new index reference!');
-          }else {
-            type = 'json-value';
-          }
-          this.createValue(i, arr[i], type)
+          var item = document.createElement('list-item');
+          item.index = i;
+          item.value = arr[i];
+          item.parent = this;
+          item.ondragstart = this.onDragStart;
+          item.ondragend = this.onDragEnd;
+          item.ondragenter = this.onDragEnter;
+          item.ondragover = this.onDragOver;
+          this.$.listItems.appendChild(item);
         }
-      },
-
-      createValue: function (index, value, type) {
-        var el = document.createElement(type);
-        var that = this;
-        
-        var containerEl = document.createElement('div');
-        containerEl.setAttribute('draggable', 'true');
-        containerEl.ondragstart = this.onDragStart;
-        containerEl.ondragend = this.onDragEnd;
-        containerEl.ondragenter = this.onDragEnter;
-        containerEl.ondragover = this.onDragOver;
-        containerEl.setAttribute('index', index);
-
-        var valueEl = document.createElement('div');
-        valueEl.classList.add('value');
-
-        var removeEl = document.createElement('core-icon');
-        removeEl.setAttribute('icon', 'delete');
-        removeEl.onclick = function () {
-          that.remove(index, containerEl)
-        }
-        
-        containerEl.appendChild(removeEl);
-        containerEl.appendChild(valueEl);
-
-        valueEl.appendChild(el);
-
-        el.parent = this.value;
-        if(type === 'json-value'){
-          el.index = index;
-        }
-        el.value = value;
-
-        this.$.listItems.appendChild(containerEl);
-      },
-
-      remove: function (index, el) {
-        this.value.remove(index);
       },
 
       setListener: function () {
@@ -169,8 +89,12 @@
       },
 
       toggleExpand: function () {
+        if(!this.isOpened){
+          this.isOpened = true;
+          this.valueChanged();
+        }
         this.$.expandIcon.classList.toggle('collapse');
-        this.$.content.classList.toggle('hidden');
+        this.contentHidden = !this.contentHidden;
         this.isClosed = '';
       },
 
@@ -178,6 +102,14 @@
         this.value.push(el.value);
         this.isClosed = '';
         this.valueChanged();
+      },
+
+      set: function (data) {
+        this.value.set(data.index, data.value);
+      },
+
+      remove: function (index) {
+        this.value.remove(index);
       },
 
       toggleAdd: function () {
@@ -189,8 +121,7 @@
       },
 
 
-      // DRAGGING OPERATIONS
-
+      // Dragging Operations
       onDragStart: function (evt) {
         event.dataTransfer.effectAllowed = 'copy';
       },
@@ -200,15 +131,12 @@
       },
 
       onDragOver: function (evt) {
-        console.log('X:' + evt.offsetX + ' Y:' + evt.offsetY);
-        console.log(evt.currentTarget);
         if(evt.target.value){
           this.insertSeparator(evt);
         }
       },
 
       onDragEnter: function (evt) {
-        console.log(evt.currentTarget);
         if(evt.target.value){
           this.insertSeparator(evt);
         }
@@ -227,12 +155,11 @@
       },
 
       move: function (evt) {
-        var startIndex = parseInt(evt.target.getAttribute('index'));
-        var beforeSeparatorIndex = parseInt(this.separator.previousSibling ? this.separator.previousSibling.getAttribute('index') : 0);
-        var afterSeparatorIndex = parseInt(this.separator.nextSibling ? this.separator.nextSibling.getAttribute('index') : beforeSeparatorIndex + 1);
-        console.log('moving ' + startIndex + ' to ' + afterSeparatorIndex);
+        var startIndex = parseInt(evt.target.shadowRoot.querySelector('#item').getAttribute('index'));
+        var beforeSeparatorIndex = parseInt(this.separator.previousSibling ? this.separator.previousSibling.shadowRoot.querySelector('#item').getAttribute('index') : 0);
+        var afterSeparatorIndex = parseInt(this.separator.nextSibling ? this.separator.nextSibling.shadowRoot.querySelector('#item').getAttribute('index') : beforeSeparatorIndex + 1);
         this.value.move(startIndex, afterSeparatorIndex);
-        this.removeSeparator();
+        this.separator = null;
       },
 
       getSeparator: function () {
@@ -242,10 +169,6 @@
         }
         return this.separator;
       },
-
-      removeSeparator: function () {
-        this.separator = null;
-      }
 
     });
   </script>

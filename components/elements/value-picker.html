@@ -58,6 +58,7 @@
       create: function (type, value) {
         var el = document.createElement(type);
         el.value = value;
+        el.parent = this.parent;
         this.parent.add(el);
       }
 

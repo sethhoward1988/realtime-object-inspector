@@ -4,43 +4,16 @@
 <polymer-element name="index-reference" attributes="value">
   <template>
     <style>
-      :host {
-        display: block;
-        position: relative;
-        width: 100%;
-      }
-
-      #content {
-        padding: 0px 0px 10px 30px;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      #expandIcon {
-        transition: all .2s;
-      }
-
-      #expandIcon.collapse {
-        transition: all .2s;
-        transform: rotate(-90deg)
-      }
-
       table td:first-child {
         padding-right: 15px;
       }
-
-      em {
-        font-style: italic;
-      }
     </style>
-    <div class="meta-data">
+    <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
-      <span id="type">Index Reference</span>
-      <span id="id"></span>
+      <span class="type color-primary">Index Reference</span>
+      <span class="color-tertiary">id="</span><span class="id color-secondary"></span><span class="color-tertiary">"</span>
     </div>
-    <div id="content" class="hidden">
+    <div id="content" hidden?="{{ contentHidden }}">
       <table>
         <tr>
           <td>index</td>
@@ -60,22 +33,17 @@
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing String');
+        this.contentHidden = true;
       },
 
       valueChanged: function () {
-        this.$.editableCell.data = {
-          value: this.value.text,
-          string: this.value,
-          type: 'string'
-        }
-        this.$.id.innerText = this.value.id;
+        this.shadowRoot.querySelector('.id').innerText = this.value.id;
       },
 
       toggleExpand: function () {
         this.$.expandIcon.classList.toggle('collapse');
-        this.$.content.classList.toggle('hidden');
-      },
+        this.contentHidden = !this.contentHidden
+      }
 
     });
   </script>

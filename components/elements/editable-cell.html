@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-input/paper-input.html">
-
 <link rel="import" href="string.html">
 <link rel="import" href="list.html">
 
@@ -12,8 +11,6 @@
       }
 
       input {
-        border: none;
-        cursor: pointer;
         height: 20px;
         border: 1px solid transparent;
         padding-left: 5px;
@@ -24,59 +21,67 @@
       }
 
       input.editing-true {
-        cursor: text;
         padding-left: 2px;
         font-style: italic;
         border: 1px solid black;
       }
+
+      input.global-editable-false:hover {
+        border: 1px solid transparent;
+        cursor: default;
+      }
+
+      input[disabled] {
+        font-family: 'RobotoDraft', sans-serif;
+        background-color: transparent;
+        color: black;
+      }
+
     </style>
-    <input class="editing-{{ isEditable }}" id="editableInput" placeholder="empty" on-click="{{ onMouseClick }}" on-blur="{{ onBlur }}" type="text" value="{{ data.value }}"></input>
+    <app-globals id="globals"></app-globals>
+    <input class="editable-input editing-{{ isEditable }} global-editable-{{ globals.documentHolder.isEditable }}"
+          type="text"
+          placeholder="empty"
+          disabled?="{{ !globals.documentHolder.isEditable }}"
+          on-click="{{ onMouseClick }}"
+          on-blur="{{ onBlur }}"
+          on-keyup="{{ onKeyup }}"
+          value="{{ data.value }}"></input>
   </template>
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing Editable Cell');
+        this.globals = this.$.globals;
+        this.input = this.shadowRoot.querySelector('.editable-input');
       },
 
       dataChanged: function () {
-        console.log('data has changed');
         this.data.originalValue = this.data.value;
       },
 
       onMouseClick: function () {
         this.isEditable = true;
-        var length = this.$.editableInput.value.length
-        this.$.editableInput.setSelectionRange(0, length);
+        var length = this.input.value.length
+        this.input.setSelectionRange(0, length);
       },
 
       onBlur: function () {
-        console.log('onBlur');
         this.isEditable = false;
-        var value = this.$.editableInput.value;
+        var value = this.input.value;
         if(value === this.data.originalValue){
           return;
         }
         this.persist();
       },
 
-      persist: function () {
-        switch(this.data.type){
-          case 'key':
-            // key value for a map
-            var value = this.data.map.get(this.data.originalValue);
-            this.data.map.set(this.data.originalValue, null);
-            this.data.map.set(this.data.value, value);
-            break;
-          case 'string':
-            this.data.string.text = this.data.value;
-            break;
-          case 'json-map':
-            this.data.parent.set(this.data.key, this.data.value);
-            break;
-          case 'json-list':
-            this.data.parent.set(this.data.index, this.data.value);
-            break;
+      onKeyup: function (evt) {
+        if(evt.keyCode === 13){
+          this.onBlur();
         }
+      },
+
+      persist: function () {
+        this.data.parent.set(this.data);
       }
 
     });

@@ -2,7 +2,9 @@
 
 <polymer-element name="app-globals">
   <script>
-    DocumentHolder = function () {}
+    DocumentHolder = function () {
+      this.isEditable = true;
+    }
     DocumentHolder.prototype = {
       getDoc: function () {
         return this.doc;
@@ -17,7 +19,7 @@
 
     var documentHolder = new d;
 
-    Polymer({
+    var config = {
       ready: function () {
         this.documentHolder = documentHolder;
         console.log('globals ready!');
@@ -33,9 +35,10 @@
 
       getModel: function () {
         return this.getDoc().getModel();
-      }
-      
-    });
+      },
+    }
+
+    Polymer(config);
 
   })(DocumentHolder);
   </script>

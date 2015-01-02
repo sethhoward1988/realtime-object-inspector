@@ -13,25 +13,25 @@
   </template>
   <script>
     Polymer({
-      ready: function () {
-        console.log('Initializing Json Value');
-      },
+      ready: function () {},
 
       valueChanged: function () {
-        var base = {
+        var data = {
           value: this.value,
           parent: this.parent
         }
-        if(this.parent && this.parent.keys){
+
+        if(this.parent.value.keys){
           // It's on a map
-          base.type = 'json-map';
-          base.key = this.key;
+          data.type = 'json-map';
+          data.key = this.key;
         } else {
           // It's on a list
-          base.type= 'json-list'
-          base.index = this.index 
+          data.type= 'json-list'
+          data.index = this.index 
         }
-        this.$.editableCell.data = base;
+
+        this.$.editableCell.data = data;
       },
 
       toggleExpand: function () {

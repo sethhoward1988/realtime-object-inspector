@@ -1,0 +1,88 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="app-globals.html">
+
+<polymer-element name="app-settings">
+  <template>
+      <style>
+
+        :host {
+          font-family: 'RobotoDraft', sans-serif;
+        }
+
+        #settings {
+          transition: all .5s;
+          width: 285px;
+          height: 100%;
+          margin-right: -250px;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+
+        #settings.active {
+          transition: all .5s;
+          margin-right: 0px;
+        }
+
+        #toggle {
+          height: 50px;
+          width: 35px;
+          margin-top: 25px;
+          background-color: #ccc;
+          float: left;
+          border-top-left-radius: 5px;
+          border-bottom-left-radius: 5px;
+          cursor: pointer;
+        }
+
+        core-icon {
+          margin-left: 8px;
+          margin-top: 12px;
+        }
+
+        #panel {
+          width: 251px;
+          height: 100%;
+          background-color: #ccc;
+          margin-left: 35px;
+        }
+
+        .content {
+          position: relative;
+        }
+
+      </style>
+      <app-globals id="globals"></app-globals>
+      <div id="settings">
+        <div id="toggle" on-click="{{ toggle }}">
+          <core-icon icon="settings"></core-icon>
+        </div>
+        <div id="panel">
+          <div class="content">
+            <div class="title">Configuration</div>
+            <table>
+              <tr>
+                <td>Enable Editing</td>
+                <td><paper-toggle-button id="enableEditingToggle" checked="{{ globals.documentHolder.isEditable }}"></paper-toggle-button></td>
+              </tr>
+            </table>
+            
+          </div>
+        </div>
+      </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing settings');
+        this.globals = this.$.globals;
+      },
+
+      toggle: function () {
+        this.$.settings.classList.toggle('active');
+      }
+    });
+  </script>
+</polymer-element>
