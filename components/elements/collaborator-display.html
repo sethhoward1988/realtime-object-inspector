@@ -1,53 +1,80 @@
 <link rel="import" href="../polymer/polymer.html">\
 
 <polymer-element name="collaborator-display" attributes="collaborators">
-  <template repeat="{{ collaborator in collaborators }}">
-    <table>
-      <tr>
-        <td>color</td>
-        <td>{{ collaborator.color }}</td>
-      </tr>
-      <tr>
-        <td>displayName</td>
-        <td>{{ collaborator.displayName }}</td>
-      </tr>
-      <tr>
-        <td>isAnonymous</td>
-        <td>{{ collaborator.isAnonymous }}</td>
-      </tr>
-      <tr>
-        <td>isMe</td>
-        <td>{{ collaborator.isMe }}</td>
-      </tr>
-      <tr>
-        <td>permissionId</td>
-        <td>{{ collaborator.permissionId }}</td>
-      </tr>
-      <tr>
-        <td>photoUrl</td>
-        <td>{{ collaborator.photoUrl }}</td>
-      </tr>
-      <tr>
-        <td>sessionId</td>
-        <td>{{ collaborator.sessionId }}</td>
-      </tr>
-      <tr>
-        <td>userId</td>
-        <td>{{ collaborator.userId }}</td>
-      </tr>
-    </table>
-    <object-display object="{{ value }}"></object-display>
+  <template bind="{{ collaborators }}">
+    <style>
+      table {
+        margin-bottom: 20px; 
+      }
+
+      :host table:last-child{
+        margin: 0;
+      }
+
+      table td:nth-child(2){
+        padding-left: 15px;
+      }
+
+    </style>
+    <div class="metadata">
+      <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <span class="type color-primary">Active Collaborators</span>
+      <span class="color-tertiary">[{{ collaborators.length }}]</span>
+    </div>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <template repeat="{{ collaborator in collaborators }}">
+        <table>
+          <tr>
+            <td class="color-primary">color</td>
+            <td class="color-string">{{ collaborator.color }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">displayName</td>
+            <td class="color-string">{{ collaborator.displayName }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">isAnonymous</td>
+            <td class="color-string">{{ collaborator.isAnonymous }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">isMe</td>
+            <td class="color-string">{{ collaborator.isMe }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">permissionId</td>
+            <td class="color-string">{{ collaborator.permissionId }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">photoUrl</td>
+            <td class="color-string">{{ collaborator.photoUrl }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">sessionId</td>
+            <td class="color-string">{{ collaborator.sessionId }}</td>
+          </tr>
+          <tr>
+            <td class="color-primary">userId</td>
+            <td class="color-string">{{ collaborator.userId }}</td>
+          </tr>
+        </table>
+      </template>
+    </div>
   </template>
   <content></content>
   <script>
     Polymer({
       ready: function () {
-        
+        this.contentHidden = true;
       },
 
-      collaboratorsChanged: function () {
-        console.log('collaborators changed');
-      }
+      toggleExpand: function () {
+        if(!this.isOpened){
+          this.isOpened = true;
+        }
+        this.$.expandIcon.classList.toggle('collapse');
+        this.contentHidden = !this.contentHidden;
+        this.isClosed = '';
+      },
     });
   </script>
 </polymer-element>

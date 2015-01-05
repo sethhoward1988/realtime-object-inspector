@@ -1,17 +1,34 @@
 <link rel="import" href="../polymer/polymer.html">
-
+<link rel="import" href="../core-ajax/core-ajax.html">
 <link rel="import" href="map.html">
 <link rel="import" href="collaborator-display.html">
 
-<polymer-element name="collab-doc" attributes="doc">
+<polymer-element name="collab-doc" attributes="doc fileId token title">
   <template>
-    <collab-map id="mapEl"></collab-map>
-    <collaborator-display id="collaborators"></collaborator-display>
+    <core-ajax
+      id="driveFileMetadataRequest"
+      url="{{ documentTitleBaseUrl }}/drive/v2/files/{{ fileId }}"
+      headers='{"Authorization": "Bearer {{ token }}"}'
+      params='{}'
+      handleAs="json"
+      on-core-response="{{ handleResponse }}">
+    </core-ajax>
+    <div class="metadata">
+      <core-icon id="expandIcon" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <span class="type color-primary">Collaborative Document</span>
+      <span class="color-tertiary">id="</span><span class="color-secondary">{{ fileId }}</span><span class="color-tertiary">" title="</span><span id="title" class="color-secondary"></span><span class="color-tertiary">"</span>
+    </div>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <collaborator-display id="collaborators"></collaborator-display>
+      <collab-map id="mapEl"></collab-map>
+    </div>
   </template>
   <script>
     Polymer({
       ready: function () {
         this.onCollaboratorChanged = this.onCollaboratorChanged.bind(this);
+        this.documentTitleBaseUrl = 'https://www.googleapis.com';
+        this.contentHidden = false;
       },
 
       docChanged: function () {
@@ -21,8 +38,25 @@
         this.doc.addEventListener(gapi.drive.realtime.EventType.COLLABORATOR_LEFT, this.onCollaboratorChanged);
       },
 
+      tokenChanged: function () {
+        this.$.driveFileMetadataRequest.go();
+      },
+
       onCollaboratorChanged: function () {
         this.$.collaborators.collaborators = this.doc.getCollaborators();
+      },
+
+      handleResponse: function (evt, resp) {
+        this.$.title.innerText = resp.response.title;
+      },
+
+      toggleExpand: function () {
+        if(!this.isOpened){
+          this.isOpened = true;
+        }
+        this.$.expandIcon.classList.toggle('collapse');
+        this.contentHidden = !this.contentHidden;
+        this.isClosed = '';
       }
 
     });

@@ -6,7 +6,7 @@
     <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
       <span class="type color-primary">Collaborative String</span>
-      <span class="color-tertiary">id="</span><span class="id color-secondary"></span><span class="color-tertiary">"</span>
+      <span class="color-tertiary">id="</span><span class="color-secondary">{{ value.id }}</span><span class="color-tertiary">"</span>
     </div>
     <div id="content" hidden?="{{ contentHidden }}">
       <editable-cell id="editableCell"></editable-cell>
@@ -25,7 +25,6 @@
           type: 'string',
           parent: this
         }
-        this.shadowRoot.querySelector('.id').innerText = this.value.id;
       },
 
       toggleExpand: function () {

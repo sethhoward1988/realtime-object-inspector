@@ -17,6 +17,10 @@ body /deep/ .color-tertiary {
   color: #c25c1f;
 }
 
+body /deep/ .color-string {
+  color: #c41a16;
+}
+
 em /deep/ {
   font-style: italic;
 }

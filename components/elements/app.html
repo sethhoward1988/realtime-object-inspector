@@ -6,24 +6,24 @@
 <polymer-element name="inspector-app">
   <template>
       <app-globals id="globals"></app-globals>
-      <collab-doc id="docEl"></collab-doc>
-      <app-settings></app-settings>
+      <collab-doc id="docEl" fileId="{{ fileId }}" token="{{ token }}"></collab-doc>
+      <!-- <app-settings></app-settings> -->
   </template>
   <script>
     Polymer({
       ready: function () {
-        window.util = new Utils();
-        var token = util.getParam('access_token');
-        var fileId = util.getParam('id');
+        this.util = new Utils();
+        this.token = this.util.getParam('access_token');
+        this.fileId = this.util.getParam('id');
         var that = this;
 
         window.gapi.load('auth:client,drive-realtime,drive-share', {
           callback:  function() {
             this.loadedDoc = null;
-            gapi.auth.setToken({access_token:token});            
+            gapi.auth.setToken({access_token:that.token});            
             that.registerTypes();
             window.gapi.drive.realtime.load(
-              fileId,
+              that.fileId,
               function(doc){
                 that.$.docEl.doc = doc;
                 that.$.globals.setDoc(doc);
