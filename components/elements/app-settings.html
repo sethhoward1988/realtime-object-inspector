@@ -5,7 +5,7 @@
 
 <link rel="import" href="app-globals.html">
 
-<polymer-element name="app-settings">
+<polymer-element name="app-settings" attributes="fileId">
   <template>
       <style>
 
@@ -91,7 +91,7 @@
             <label for="edit">Enable Editing</label>
             <input id="edit" name="edit" type="checkbox" checked="{{ globals.documentHolder.isEditable }}"></input>
           </div>
-          <core-icon hidden?="{{ self == top }}" id="openInNew" icon="open-in-new" on-click="{{ popOut }}"></core-icon>
+          <core-icon hidden?="{{ isInFrame }}" id="openInNew" icon="open-in-new" on-click="{{ popOut }}"></core-icon>
           <core-icon id="close" icon="close" on-click="{{ close }}"></core-icon>
         </div>
       </div>
@@ -100,10 +100,13 @@
     Polymer({
       ready: function () {
         this.globals = this.$.globals;
+        //this.isInFrame = (self == top);
       },
 
       popOut: function () {
-        window.open(self.location.href);
+        var strWindowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+        window.open(self.location.href, 'realtime_debugger_window', strWindowFeatures);
+        this.close();
       },
 
       close: function () {
@@ -112,7 +115,7 @@
           window.close();
         } else {
           // We are in an iframe, remove the iframe
-          window.close();
+          top.postMessage(this.fileId, '*');
         }
       }
     });
