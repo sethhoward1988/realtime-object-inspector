@@ -99,7 +99,7 @@ body /deep/ delete-icon {
 }
 
 body /deep/ collab-doc::shadow .metadata {
-  margin-top: 10px;
+  
 }
 
 body /deep/ collab-doc /deep/ core-icon {

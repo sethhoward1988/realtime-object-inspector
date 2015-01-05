@@ -3,14 +3,18 @@
 <polymer-element name="app-globals">
   <script>
     DocumentHolder = function () {
-      this.isEditable = true;
+      this.loadedDocs = {};
     }
     DocumentHolder.prototype = {
-      getDoc: function () {
-        return this.doc;
+      addDoc: function (fileId, doc) {
+        this.loadedDocs[fileId] = {
+          doc: doc,
+          isEditable: false
+        }
       },
-      setDoc: function (doc) {
-        this.doc = doc;
+
+      getDoc: function (fileId) {
+        return this.loadedDocs[fileId].doc;
       }
     }
   </script>
@@ -22,19 +26,18 @@
     var config = {
       ready: function () {
         this.documentHolder = documentHolder;
-        console.log('globals ready!');
       },
 
-      setDoc: function (doc) {
-        this.documentHolder.setDoc(doc);
+      addDoc: function (fileId, doc) {
+        this.documentHolder.addDoc(fileId, doc);
       },
 
-      getDoc: function () {
-        return this.documentHolder.getDoc();
+      getDoc: function (fileId) {
+        return this.documentHolder.getDoc(fileId);
       },
 
-      getModel: function () {
-        return this.getDoc().getModel();
+      getModel: function (fileId) {
+        return this.getDoc(fileId).getModel();
       },
     }
 

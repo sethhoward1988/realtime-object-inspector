@@ -6,32 +6,45 @@
 <polymer-element name="inspector-app">
   <template>
       <app-globals id="globals"></app-globals>
-      <app-settings fileId="{{ fileId }}"></app-settings>
-      <collab-doc id="docEl" fileId="{{ fileId }}" token="{{ token }}"></collab-doc>
+      <app-settings fileId="{{ fileIds }}"></app-settings>
+      <div id="docs"></div>
   </template>
   <script>
     Polymer({
       ready: function () {
         this.util = new Utils();
         this.token = this.util.getParam('access_token');
-        this.fileId = this.util.getParam('id');
+        this.fileIds = this.util.getParam('ids');
+        var splitIds = this.fileIds.split(',');
         var that = this;
 
         window.gapi.load('auth:client,drive-realtime,drive-share', {
           callback:  function() {
-            this.loadedDoc = null;
-            gapi.auth.setToken({access_token:that.token});            
+            gapi.auth.setToken({ access_token: that.token});
             that.registerTypes();
-            window.gapi.drive.realtime.load(
-              that.fileId,
-              function(doc){
-                that.$.docEl.doc = doc;
-                that.$.globals.setDoc(doc);
-              }, function(){
-                throw new Error;
-              }, function (e) {
-            });
+            for(var i = 0; i < splitIds.length; i++){
+              var run = function loadDoc (fileId) {
+                that.load(fileId);
+              }(splitIds[i]);
+            }
           }
+        });
+      },
+
+      load: function (fileId) {
+        var that = this;
+        window.gapi.drive.realtime.load(
+          fileId,
+          function(doc){
+            var docEl = document.createElement('collab-doc');
+            that.$.globals.addDoc(fileId, doc);
+            docEl.doc = doc;
+            docEl.fileId = fileId;
+            docEl.token = that.token;
+            that.$.docs.appendChild(docEl);
+          }, function(){
+            throw new Error;
+          }, function (e) {
         });
       },
 

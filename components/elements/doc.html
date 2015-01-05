@@ -14,7 +14,7 @@
       on-core-response="{{ handleResponse }}">
     </core-ajax>
     <div class="metadata">
-      <core-icon id="expandIcon" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
       <span class="type color-primary">Collaborative Document</span>
       <span class="color-tertiary">id="</span><span class="color-secondary">{{ fileId }}</span><span class="color-tertiary">" title="</span><span id="title" class="color-secondary"></span><span class="color-tertiary">"</span>
     </div>
@@ -28,7 +28,7 @@
       ready: function () {
         this.onCollaboratorChanged = this.onCollaboratorChanged.bind(this);
         this.documentTitleBaseUrl = 'https://www.googleapis.com';
-        this.contentHidden = false;
+        this.contentHidden = true;
       },
 
       docChanged: function () {
