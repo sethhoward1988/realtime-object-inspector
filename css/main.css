@@ -98,7 +98,11 @@ body /deep/ delete-icon {
   height: 18px;
 }
 
-body /deep/ core-icon {
+body /deep/ collab-doc::shadow .metadata {
+  margin-top: 10px;
+}
+
+body /deep/ collab-doc /deep/ core-icon {
   width: 20px !important;
   height: 20px !important;
   color: #6E6E6E;

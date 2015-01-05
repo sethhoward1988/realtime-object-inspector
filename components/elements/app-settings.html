@@ -1,6 +1,8 @@
 <link rel="import" href="../polymer/polymer.html">
 
-<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../core-icon/core-icon.html">
+<link rel="import" href="../core-icon/core-icon.html">
+
 <link rel="import" href="app-globals.html">
 
 <polymer-element name="app-settings">
@@ -9,66 +11,88 @@
 
         :host {
           font-family: 'RobotoDraft', sans-serif;
+          width: 100%;
         }
 
-        #settings {
-          transition: all .5s;
-          width: 285px;
-          height: 100%;
-          margin-right: -250px;
-          position: absolute;
-          right: 0;
-          top: 0;
+        #container {
+          width: 100%;
+          height: 25px;
+          border-top: 1px solid #A3A3A3;
+          border-bottom: 1px solid #A3A3A3;
+          background-color: #DFDFDF;
+          font-size: 13px;
+          line-height: 25px;
         }
 
-        #settings.active {
-          transition: all .5s;
-          margin-right: 0px;
-        }
-
-        #toggle {
-          height: 50px;
-          width: 35px;
-          margin-top: 25px;
-          background-color: #ccc;
+        #left {
           float: left;
-          border-top-left-radius: 5px;
-          border-bottom-left-radius: 5px;
-          cursor: pointer;
+          margin-left: 10px;
+        }
+
+        #right {
+          float: right;
+        }
+
+        #close {
+          transition: none;
+          border-radius: 25px;
+        }
+
+        #close:hover {
+          background-color: #e89892;
+          color: white;
+          transition: none;
         }
 
         core-icon {
-          margin-left: 8px;
-          margin-top: 12px;
+          margin: 0px 2px;
         }
 
-        #panel {
-          width: 251px;
-          height: 100%;
-          background-color: #ccc;
-          margin-left: 35px;
+        #close {
+          height: 16px !important;
+          width: 16px !important;
+          color: #666;
+          margin-top: -3px;
         }
 
-        .content {
-          position: relative;
+        #openInNew {
+          height: 18px !important;
+          width: 18px !important;
+          color: #666;
+          margin-top: -3px;
+        }
+
+        #openInNew:hover {
+          color: #333;
+        }
+
+        input[type=checkbox] {
+          vertical-align: middle;
+
+        }
+
+        .control {
+          display: inline-block;
+          margin: 0 10px;
+        }
+
+        label {
+          padding: 0px 5px;
         }
 
       </style>
       <app-globals id="globals"></app-globals>
-      <div id="settings">
-        <div id="toggle" on-click="{{ toggle }}">
-          <core-icon icon="settings"></core-icon>
+      <div id="container">
+        <div id="left">
+          Realtime Debug Console
         </div>
-        <div id="panel">
-          <div class="content">
-            <div class="title">Configuration</div>
-            <table>
-              <tr>
-                <td>Enable Editing</td>
-                <td><paper-toggle-button id="enableEditingToggle" checked="{{ globals.documentHolder.isEditable }}"></paper-toggle-button></td>
-              </tr>
-            </table>
+        <div id="right">
+          <div class="control">
+            <label for="edit">Enable Editing</label>
+            <input id="edit" name="edit" type="checkbox" checked="{{ globals.documentHolder.isEditable }}"></input>
           </div>
+          <core-icon hidden?="{{ self == top }}" id="openInNew" icon="open-in-new" on-click="{{ popOut }}"></core-icon>
+          <core-icon id="close" icon="close" on-click="{{ close }}"></core-icon>
         </div>
       </div>
   </template>
@@ -78,8 +102,18 @@
         this.globals = this.$.globals;
       },
 
-      toggle: function () {
-        this.$.settings.classList.toggle('active');
+      popOut: function () {
+        window.open(self.location.href);
+      },
+
+      close: function () {
+        if(self == top){
+          // We are not in an iframe, close the tab
+          window.close();
+        } else {
+          // We are in an iframe, remove the iframe
+          window.close();
+        }
       }
     });
   </script>
