@@ -1,22 +1,30 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <link rel="import" href="map.html">
+<link rel="import" href="collaborator-display.html">
 
 <polymer-element name="collab-doc" attributes="doc">
   <template>
-	    <collab-map id="mapEl"></collab-map>
+    <collab-map id="mapEl"></collab-map>
+    <collaborator-display id="collaborators"></collaborator-display>
   </template>
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing Document');
+        this.onCollaboratorChanged = this.onCollaboratorChanged.bind(this);
       },
 
       docChanged: function () {
-        console.log('doc has changed!');
         this.$.mapEl.value = this.doc.getModel().getRoot();
-        this.doesDocExist = !!this.doc;
+        this.$.collaborators.collaborators = this.doc.getCollaborators();
+        this.doc.addEventListener(gapi.drive.realtime.EventType.COLLABORATOR_JOINED, this.onCollaboratorChanged);
+        this.doc.addEventListener(gapi.drive.realtime.EventType.COLLABORATOR_LEFT, this.onCollaboratorChanged);
+      },
+
+      onCollaboratorChanged: function () {
+        this.$.collaborators.collaborators = this.doc.getCollaborators();
       }
+
     });
   </script>
 </polymer-element>

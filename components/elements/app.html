@@ -12,7 +12,6 @@
   <script>
     Polymer({
       ready: function () {
-        console.log('Initializing Document');
         window.util = new Utils();
         var token = util.getParam('access_token');
         var fileId = util.getParam('id');
@@ -21,19 +20,16 @@
         window.gapi.load('auth:client,drive-realtime,drive-share', {
           callback:  function() {
             this.loadedDoc = null;
-            console.log('loaded success');
             gapi.auth.setToken({access_token:token});            
             that.registerTypes();
             window.gapi.drive.realtime.load(
               fileId,
               function(doc){
-                console.log('loading file...');
                 that.$.docEl.doc = doc;
                 that.$.globals.setDoc(doc);
               }, function(){
                 throw new Error;
               }, function (e) {
-                console.log('Error!');
             });
           }
         });
