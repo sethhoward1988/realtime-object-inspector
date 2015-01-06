@@ -15,11 +15,21 @@
         this.util = new Utils();
         this.token = this.util.getParam('access_token');
         this.fileIds = this.util.getParam('ids');
+        var serverHash = this.getServerUrl();
         var splitIds = this.fileIds.split(',');
         var that = this;
+        var config = {};
+
+        if(serverHash){
+          config['drive-realtime'] = { 'server': serverHash.apiUrl };
+        }
 
         window.gapi.load('auth:client,drive-realtime,drive-share', {
+          config: config,
           callback:  function() {
+            if(serverHash){
+              gapi.drive.realtime.setServerAddress(serverHash.serverUrl);
+            }
             gapi.auth.setToken({ access_token: that.token});
             that.registerTypes();
             for(var i = 0; i < splitIds.length; i++){
@@ -67,6 +77,37 @@
         Movie.prototype.notes = custom.collaborativeField('notes');
         Movie.prototype.rating = custom.collaborativeField('rating');
         custom.setInitializer(Movie, Movie.prototype.initialize);
+      },
+
+      getServerUrl: function () {
+        var serverUrl = this.util.getParam('ids');
+        var sandboxUrl, apiUrl, unknownServerUrl;
+        if(this.serverUrl){
+          switch(this.serverUrl){
+            case 'sandbox':
+              sandboxUrl = true;
+              apiUrl = 'https://drive.sandbox.google.com/otservice';
+              serverUrl = apiUrl;
+              break;
+            case 'canary':
+              apiUrl = 'https://drive.google.com/otservice/canary';
+              serverUrl = 'https://drive.google.com/otservice';
+              break;
+            case 'scary':
+              apiUrl = 'https://drive.google.com/otservice/scary';
+              serverUrl = 'https://drive.google.com/otservice';
+              break;
+            default:
+              unknownServerUrl = true;
+              apiUrl = serverUrl;
+          }
+          return {
+            serverUrl: serverUrl,
+            apiUrl: apiUrl
+          }
+        } else {
+          return null;
+        }
       }
     });
   </script>

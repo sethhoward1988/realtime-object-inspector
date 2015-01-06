@@ -23,7 +23,7 @@
 
     var documentHolder = new d;
 
-    var config = {
+    Polymer({
       ready: function () {
         this.documentHolder = documentHolder;
       },
@@ -39,9 +39,7 @@
       getModel: function (fileId) {
         return this.getDoc(fileId).getModel();
       },
-    }
-
-    Polymer(config);
+    });
 
   })(DocumentHolder);
   </script>

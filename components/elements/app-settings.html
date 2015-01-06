@@ -100,7 +100,8 @@
     Polymer({
       ready: function () {
         this.globals = this.$.globals;
-        //this.isInFrame = (self == top);
+        this.onDrag = this.onDrag.bind(this);
+        this.$.container.addEventListener('drag', this.onDrag);
       },
 
       popOut: function () {
@@ -117,6 +118,13 @@
           // We are in an iframe, remove the iframe
           top.postMessage(this.fileId, '*');
         }
+      },
+
+      onDrag: function (evt) {
+        if(evt.y = 0){
+          return;
+        }
+        top.postMessage('realtime' + evt.y, '*');
       }
     });
   </script>
