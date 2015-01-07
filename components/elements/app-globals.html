@@ -4,12 +4,13 @@
   <script>
     DocumentHolder = function () {
       this.loadedDocs = {};
+      this.isEditable = false;
+      this.isDebugable = false;
     }
     DocumentHolder.prototype = {
       addDoc: function (fileId, doc) {
         this.loadedDocs[fileId] = {
-          doc: doc,
-          isEditable: false
+          doc: doc
         }
       },
 

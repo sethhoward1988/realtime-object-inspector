@@ -24,6 +24,7 @@
     <app-globals id="globals"></app-globals>
     <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <core-icon id="debugIcon" hidden?="{{ !globals.documentHolder.isDebugable }}" icon="label-outline" on-click="{{ toggleDebug }}"></core-icon>
       <span class="type color-primary">Collaborative List</span>
       <span class="color-tertiary">id="</span><span class="color-secondary">{{ value.id }}</span><span class="color-tertiary">"</span>
     </div>
@@ -42,6 +43,7 @@
         this.$.picker.parent = this;
         this.valueChanged = this.valueChanged.bind(this);
         this.contentHidden = true;
+        this.debug = false;
         this.setBindings();
       },
 
@@ -53,17 +55,22 @@
       },
 
       valueChanged: function () {
-        this.setListener();
         if(!this.isOpened){
           return;
         }
+        if(this.debug){
+          debugger;
+        }
+        this.update();
+      },
 
+      update: function () {
+        this.setListener();
         if(this.$.listItems.childNodes.length){
           while (this.$.listItems.firstChild) {
               this.$.listItems.removeChild(this.$.listItems.firstChild);
           }
         }
-
         var arr = this.value.asArray();
         for(var i = 0; i < arr.length; i++){
           var item = document.createElement('list-item');
@@ -90,11 +97,16 @@
       toggleExpand: function () {
         if(!this.isOpened){
           this.isOpened = true;
-          this.valueChanged();
+          this.update();
         }
         this.$.expandIcon.classList.toggle('collapse');
         this.contentHidden = !this.contentHidden;
         this.isClosed = '';
+      },
+
+      toggleDebug: function () {
+        this.debug = !this.debug;
+        this.shadowRoot.querySelector('.metadata').classList.toggle('debug-active');
       },
 
       add: function (el) {

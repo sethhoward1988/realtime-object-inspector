@@ -29,6 +29,7 @@
     <app-globals id="globals"></app-globals>
     <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <core-icon id="debugIcon" hidden?="{{ !globals.documentHolder.isDebugable }}" icon="label-outline" on-click="{{ toggleDebug }}"></core-icon>
       <span class="type color-primary">Collaborative Map</span>
       <span class="color-tertiary">id="</span><span class="color-secondary">{{ value.id }}</span><span class="color-tertiary">"</span>
     </div>
@@ -49,6 +50,7 @@
         this.globals = this.$.globals;
         this.$.picker.parent = this;
         this.contentHidden = true;
+        this.debug = false;
         this.valueChanged = this.valueChanged.bind(this);
       },
 
@@ -56,6 +58,13 @@
         if(!this.isOpened){
           return;
         }
+        if(this.debug){
+          debugger;
+        }
+        this.update();
+      },
+
+      update: function () {
         this.setListener();
         if(this.$.mapItems.childNodes.length){
           while (this.$.mapItems.firstChild) {
@@ -82,12 +91,17 @@
       toggleExpand: function () {
         if(!this.isOpened){
           this.isOpened = true;
-          this.valueChanged();
+          this.update();
         }
         this.$.expandIcon.classList.toggle('collapse');
         this.$.content.classList.toggle('hidden');
         this.isClosed = '';
         this.contentHidden = !this.contentHidden;
+      },
+
+      toggleDebug: function () {
+        this.debug = !this.debug;
+        this.shadowRoot.querySelector('.metadata').classList.toggle('debug-active');
       },
 
       add: function (el) {

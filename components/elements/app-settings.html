@@ -73,7 +73,7 @@
 
         .control {
           display: inline-block;
-          margin: 0 10px;
+          margin-right: 5px;
         }
 
         label {
@@ -88,10 +88,14 @@
         </div>
         <div id="right">
           <div class="control">
-            <label for="edit">Enable Editing</label>
+            <label for="debug">Debug</label>
+            <input id="debug" name="debug" type="checkbox" checked="{{ globals.documentHolder.isDebugable }}"></input>
+          </div>
+          <div class="control">
+            <label for="edit">Edit</label>
             <input id="edit" name="edit" type="checkbox" checked="{{ globals.documentHolder.isEditable }}"></input>
           </div>
-          <core-icon hidden?="{{ isInFrame }}" id="openInNew" icon="open-in-new" on-click="{{ popOut }}"></core-icon>
+          <core-icon hidden?="{{ !isInFrame }}" id="openInNew" icon="open-in-new" on-click="{{ popOut }}"></core-icon>
           <core-icon id="close" icon="close" on-click="{{ close }}"></core-icon>
         </div>
       </div>
@@ -100,6 +104,7 @@
     Polymer({
       ready: function () {
         this.globals = this.$.globals;
+        this.isInFrame = (window != top);
 
         var initString = 'init:' + 
             'handleLeftOffset:155,' + 
@@ -110,18 +115,18 @@
       },
 
       popOut: function () {
-        var strWindowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes";
+        var strWindowFeatures = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=yes";
         window.open(self.location.href, 'realtime_debugger_window', strWindowFeatures);
         this.close();
       },
 
       close: function () {
-        if(self == top){
-          // We are not in an iframe, close the tab
-          window.close();
-        } else {
+        if(this.isInFrame){
           // We are in an iframe, remove the iframe
           top.postMessage('close', '*');
+        } else {
+          // We are not in an iframe, close the tab
+          window.close();
         }
       }
     });

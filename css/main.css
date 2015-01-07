@@ -74,6 +74,24 @@ body /deep/ #expandIcon.collapse {
   transform: rotate(-90deg)
 }
 
+body /deep/ .metadata.debug-active {
+  background-color: #ABBFFE;
+  border: 1px solid #4073F4;
+}
+
+body /deep/ .metadata {
+  border: 1px solid transparent;
+  margin-top: -1px;
+}
+
+body /deep/ .metadata.debug-active #debugIcon {
+  color: white;
+}
+
+body /deep/ #debugIcon {
+  margin: 0 4px 0 -12px;
+}
+
 body /deep/ .add-item {
   transition: all .3s;
   vertical-align: top;
@@ -90,12 +108,12 @@ body /deep/ value-picker, paper-input {
 }
 
 body /deep/ .metadata span {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 body /deep/ delete-icon {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
 }
 
 body /deep/ collab-doc::shadow .metadata {
@@ -103,8 +121,8 @@ body /deep/ collab-doc::shadow .metadata {
 }
 
 body /deep/ collab-doc /deep/ core-icon {
-  width: 20px !important;
-  height: 20px !important;
+  width: 18px !important;
+  height: 18px !important;
   color: #6E6E6E;
   cursor: default;
   transition: all .2s;

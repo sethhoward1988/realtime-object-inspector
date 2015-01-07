@@ -3,8 +3,10 @@
 
 <polymer-element name="collab-string" attributes="value">
   <template>
+    <app-globals id="globals"></app-globals>
     <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <core-icon id="debugIcon" hidden?="{{ !globals.documentHolder.isDebugable }}" icon="label-outline" on-click="{{ toggleDebug }}"></core-icon>
       <span class="type color-primary">Collaborative String</span>
       <span class="color-tertiary">id="</span><span class="color-secondary">{{ value.id }}</span><span class="color-tertiary">"</span>
     </div>
@@ -15,10 +17,24 @@
   <script>
     Polymer({
       ready: function () {
+        this.globals = this.$.globals;
+        this.valueChanged = this.valueChanged.bind(this);
         this.contentHidden = true;
+        this.debug = false;
       },
 
       valueChanged: function () {
+        if(!this.isOpened){
+          return;
+        }
+        if(this.debug){
+          debugger;
+        }
+        this.update();
+      },
+
+      update: function () {
+        this.setListeners();
         this.$.editableCell.data = {
           value: this.value.text,
           string: this.value,
@@ -27,9 +43,25 @@
         }
       },
 
+      setListeners: function () {
+        if(!this.listenerSet){
+          this.value.addEventListener(gapi.drive.realtime.EventType.TEXT_INSERTED, this.valueChanged);
+          this.value.addEventListener(gapi.drive.realtime.EventType.TEXT_DELETED, this.valueChanged);
+        }
+      },
+
       toggleExpand: function () {
+        if(!this.isOpened){
+          this.isOpened = true;
+          this.update();
+        }
         this.$.expandIcon.classList.toggle('collapse');
         this.contentHidden = !this.contentHidden;
+      },
+
+      toggleDebug: function () {
+        this.debug = !this.debug;
+        this.shadowRoot.querySelector('.metadata').classList.toggle('debug-active');
       },
 
       set: function (data) {
