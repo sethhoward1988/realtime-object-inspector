@@ -5,9 +5,14 @@
 
 <polymer-element name="inspector-app">
   <template>
-      <app-globals id="globals"></app-globals>
-      <app-settings fileId="{{ fileIds }}"></app-settings>
-      <div id="docs"></div>
+    <style>
+      #docs {
+        margin-top: 27px;
+      }
+    </style>
+    <app-globals id="globals"></app-globals>
+    <app-settings fileId="{{ fileIds }}"></app-settings>
+    <div id="docs"></div>
   </template>
   <script>
     Polymer({
