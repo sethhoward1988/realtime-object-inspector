@@ -101,16 +101,12 @@
       ready: function () {
         this.globals = this.$.globals;
 
-        var handleLeftOffset = 155;
-        var handleRightOffset = 177;
-        var handleHeight = 27;
-
-        var init = 'init:' + 
-            'handleLeftOffset:142,' + 
+        var initString = 'init:' + 
+            'handleLeftOffset:155,' + 
             'handleRightOffset:177,' + 
             'handleHeight:27'
 
-        top.postMessage(init, '*');
+        top.postMessage(initString, '*');
       },
 
       popOut: function () {
