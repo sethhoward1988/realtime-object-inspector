@@ -1,0 +1,147 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-icons/image-icons.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../core-icon-button/core-icon-button.html">
+<link rel="import" href="string.html">
+<link rel="import" href="list.html">
+<link rel="import" href="value-picker.html">
+<link rel="import" href="json.html">
+<link rel="import" href="index-reference.html">
+<link rel="import" href="map-item.html">
+
+<polymer-element name="collab-map" attributes="value">
+  <template>
+    <style>
+      .key {
+        width: 150px;
+      }
+
+      .key, .value {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .item-container {
+        padding: 3px;
+      }
+    </style>
+    <app-globals id="globals"></app-globals>
+    <div class="metadata">
+      <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
+      <core-icon id="debugIcon" hidden?="{{ !globals.documentHolder.isDebugable }}" icon="label-outline" on-click="{{ toggleDebug }}"></core-icon>
+      <span class="type color-primary">Collaborative Map</span>
+      <span class="color-tertiary">id="</span><span class="color-secondary">{{ value.id }}</span><span class="color-tertiary">"</span>
+    </div>
+    <div id="content" hidden?="{{ contentHidden }}">
+      <div id="mapItems"></div>
+      <div id="add" hidden?="{{ !globals.documentHolder.isEditable }}">
+        <core-icon class="add-item {{ isClosed }}" on-click="{{ toggleAdd }}" icon="add"></core-icon>
+        <div class="key" hidden?="{{ !isClosed }}">
+          <paper-input label="new key" id="newKey" value="{{ newKeyValue }}"></paper-input>
+        </div>
+        <value-picker hidden?="{{ !newKeyValue || !isClosed }}" id="picker"></value-picker>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        this.globals = this.$.globals;
+        this.$.picker.parent = this;
+        this.contentHidden = true;
+        this.debug = false;
+        this.valueChanged = this.valueChanged.bind(this);
+      },
+
+      valueChanged: function () {
+        if(!this.isOpened){
+          return;
+        }
+        if(this.debug){
+          debugger;
+        }
+        this.update();
+      },
+
+      update: function () {
+        this.setListener();
+        if(this.$.mapItems.childNodes.length){
+          while (this.$.mapItems.firstChild) {
+              this.$.mapItems.removeChild(this.$.mapItems.firstChild);
+          }
+        }
+        var keys = this.value.keys();
+        for(var i = 0; i < keys.length; i++){
+          var item = document.createElement('map-item');
+          item.key = keys[i];
+          item.value = this.value.get(keys[i]);
+          item.parent = this;
+          this.$.mapItems.appendChild(item);
+        }
+      },
+
+      setListener: function () {
+        if(!this.listenerSet){
+          this.value.addEventListener(gapi.drive.realtime.EventType.VALUE_CHANGED, this.valueChanged);
+          this.listenerSet = true;
+        }
+      },
+
+      toggleExpand: function () {
+        if(!this.isOpened){
+          this.isOpened = true;
+          this.update();
+        }
+        this.$.expandIcon.classList.toggle('collapse');
+        this.$.content.classList.toggle('hidden');
+        this.isClosed = '';
+        this.contentHidden = !this.contentHidden;
+      },
+
+      toggleDebug: function () {
+        this.debug = !this.debug;
+        this.shadowRoot.querySelector('.metadata').classList.toggle('debug-active');
+      },
+
+      add: function (el) {
+        if(!this.$.newKey.value){
+          alert('You must supply a key before selecting a new object');
+          return;
+        }
+        this.value.set(this.$.newKey.value, el.value);
+        this.isClosed = '';
+      },
+
+      set: function (data) {
+        if(data.type === 'key'){
+          this.setKey(data);
+        } else {
+          this.setValue(data);
+        }
+      },
+
+      remove: function (key) {
+        this.value.set(key, null);
+      },
+
+      setKey: function (data) {
+        var value = this.value.get(data.originalValue);
+        this.value.set(data.originalValue, null);
+        this.value.set(data.value, value);
+      },
+
+      setValue: function (data) {
+        this.value.set(data.key, data.value)
+      },
+
+      toggleAdd: function () {
+        if(!this.isClosed){
+          this.isClosed = 'close';
+        } else {
+          this.isClosed = '';
+        }
+      }
+
+    });
+  </script>
+</polymer-element>

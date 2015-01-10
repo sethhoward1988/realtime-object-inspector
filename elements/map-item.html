@@ -1,0 +1,89 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="string.html">
+<link rel="import" href="map.html">
+<link rel="import" href="json.html">
+<link rel="import" href="app-globals.html">
+
+<polymer-element name="map-item" attributes="key value parent">
+  <template>
+    <style>
+      #item[draggable=true]:hover{
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
+        cursor: grab;
+      }
+
+      #value {
+        display: inline-block;
+      }
+
+      .key-actions {
+        vertical-align: top;
+        display: inline-block;
+      }
+
+    </style>
+    <app-globals id="globals"></app-globals>
+    <div id="item" index="{{ index }}">
+      <div class="key-actions">
+        <core-icon
+          class="delete-icon"
+          icon="delete"
+          hidden?="{{ !globals.documentHolder.isEditable }}"
+          on-click="{{ remove }}">
+        </core-icon>
+        <editable-cell id="key"></editable-cell>
+      </div>
+      <div id="value"></div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function () {
+        console.log('Initializing Map Item');
+        this.globals = this.$.globals;
+      },
+
+      keyChanged: function () {
+        this.$.key.data = {
+          type: 'key',
+          value: this.key,
+          parent: this.parent
+        }    
+      },
+
+      valueChanged: function () {
+        this.clear();
+        if(this.value.keys){
+          type = 'collab-map';
+        } else if (this.value.getText){
+          type = 'collab-string';
+        } else if (this.value.push){
+          type = 'collab-list';
+        } else if (this.value.referencedObject) {
+          type = 'index-reference';
+        } else {
+          type = 'json-value';
+        }
+        var value = document.createElement(type);
+        if(type === 'json-value'){
+          value.key = this.key;
+          value.parent = this.parent;
+        }
+        value.value = this.value;
+        this.$.value.appendChild(value);
+      },
+
+      remove: function () {
+        this.parent.remove(this.key);
+      },
+
+      clear: function () {
+        var children = this.$.value.children;
+        for(var i = 0; i < children.length; i++){
+          this.$.value.removeChild(children[i]);
+        }
+      }
+    });
+  </script>
+</polymer-element>

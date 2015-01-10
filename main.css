@@ -1,0 +1,179 @@
+html,body {
+  height: calc(100% - 15px);
+  margin: 0;
+  cursor: default;
+  font-family: 'Lucida Console', 'Lucida Sans Typewriter', monaco, 'Bitstream Vera Sans Mono', monospace;
+}
+
+body /deep/ .color-primary {
+  color: #882083;
+}
+
+body /deep/ .color-secondary {
+  color: #213dcc;
+}
+
+body /deep/ .color-tertiary {
+  color: #c25c1f;
+}
+
+body /deep/ .color-string {
+  color: #c41a16;
+}
+
+em /deep/ {
+  font-style: italic;
+}
+
+body /deep/ collab-list,
+body /deep/ collab-map,
+body /deep/ collab-string,
+body /deep/ json-value,
+body /deep/ index-reference,
+body /deep/ list-item,
+body /deep/ map-item {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0px;
+}
+
+body /deep/ collab-list > collab-map,
+body /deep/ collab-list > collab-list,
+body /deep/ collab-list > collab-string,
+body /deep/ collab-map > collab-map,
+body /deep/ collab-map > collab-list,
+body /deep/ collab-map > collab-string, {
+  padding: 20px;
+}
+
+body /deep/ #content {
+  padding: 0px 0px 10px 30px;
+}
+
+body /deep/ .value {
+  display: inline-block;
+}
+
+body /deep/ .id {
+  font-style: italic;
+}
+
+body /deep/ .type {
+  margin-left: -10px;
+}
+
+body /deep/ #expandIcon.collapse {
+  transition: all .2s;
+  transform: rotate(-90deg)
+}
+
+body /deep/ .metadata.debug-active {
+  background-color: #ABBFFE;
+  border: 1px solid #4073F4;
+}
+
+body /deep/ .metadata {
+  border: 1px solid transparent;
+  margin-top: -1px;
+}
+
+body /deep/ .metadata.debug-active #debugIcon {
+  color: white;
+}
+
+body /deep/ #debugIcon {
+  margin: 0 4px 0 -12px;
+}
+
+body /deep/ .add-item {
+  transition: all .3s;
+  vertical-align: top;
+  color: #6E6E6E;
+}
+
+body /deep/ .add-item.close {
+  transition: all .3s;
+  transform: rotate(45deg);
+}
+
+body /deep/ value-picker, paper-input {
+  display: inline-block;
+}
+
+body /deep/ .metadata span {
+  font-size: 13px;
+}
+
+body /deep/ delete-icon {
+  width: 19px;
+  height: 19px;
+}
+
+body /deep/ collab-doc::shadow .metadata {
+  
+}
+
+body /deep/ collab-doc /deep/ core-icon {
+  width: 18px !important;
+  height: 18px !important;
+  color: #6E6E6E;
+  cursor: default;
+  transition: all .2s;
+}
+
+
+/* Editable Inputs */
+
+body /deep/ editable-cell {
+  padding-right: 5px;
+}
+
+body /deep/ input,
+body /deep/ input[disabled] {
+  font-family: 'Lucida Console', 'Lucida Sans Typewriter', monaco, 'Bitstream Vera Sans Mono', monospace;
+  height: 18px;
+  border: 1px solid transparent;
+  padding: 0px 0px 0px 5px;
+  margin: 0;
+  font-size: 12px;
+}
+
+body /deep/ input:hover {
+  cursor: default;
+}
+
+body /deep/ editable-cell input:hover {
+  border: 1px dashed black;
+}
+
+body /deep/ editable-cell input.editing-true {
+  padding-left: 2px;
+  font-style: italic;
+  border: 1px solid black;
+}
+
+body /deep/ editable-cell input.global-editable-false:hover {
+  border: 1px solid transparent;
+  cursor: default;
+}
+
+body /deep/ editable-cell input[disabled] {
+  font-family: 'RobotoDraft', sans-serif;
+  background-color: transparent;
+  color: black;
+}
+
+
+
+/* Index Reference */
+
+body /deep/ td {
+  font-size: 12px;
+}
+
+body /deep/ paper-input,
+body /deep/ td,
+body /deep/ paper-item {
+  font-size: 12px;
+}
