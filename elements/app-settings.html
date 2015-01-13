@@ -1,7 +1,7 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 
-<link rel="import" href="../core-icon/core-icon.html">
-<link rel="import" href="../core-icon/core-icon.html">
+<link rel="import" href="../components/core-icon/core-icon.html">
+<link rel="import" href="../components/core-icon/core-icon.html">
 
 <link rel="import" href="app-globals.html">
 
@@ -109,13 +109,12 @@
       ready: function () {
         this.globals = this.$.globals;
         this.isInFrame = (window != top);
-
-        var initString = 'init:' + 
-            'handleLeftOffset:155,' + 
-            'handleRightOffset:177,' + 
-            'handleHeight:27'
-
-        top.postMessage(initString, '*');
+        this.globals.messenger.post({
+          type: 'init',
+          handleLeftOffset: 155,
+          handleRightOffset: 177,
+          handleHeight: 27
+        });
       },
 
       popOut: function () {
@@ -127,7 +126,9 @@
       close: function () {
         if(this.isInFrame){
           // We are in an iframe, remove the iframe
-          top.postMessage('close', '*');
+          this.globals.messenger.post({
+            type: 'close'
+          });
         } else {
           // We are not in an iframe, close the tab
           window.close();

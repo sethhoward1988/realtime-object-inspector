@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 <link rel="import" href="string.html">
 <link rel="import" href="map.html">
 <link rel="import" href="json.html">
@@ -50,8 +50,9 @@
         var value = document.createElement(type);
         if(type === 'json-value'){
           value.index = this.index;
-          value.parent = this.parent;
         }
+        value.parent = this.parent;
+        value.fileId = this.fileId;
         value.value = this.value;
         this.$.value.appendChild(value);
       },

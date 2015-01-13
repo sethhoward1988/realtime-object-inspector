@@ -1,7 +1,7 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../core-icons/image-icons.html">
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../core-icon-button/core-icon-button.html">
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-icons/image-icons.html">
+<link rel="import" href="../components/paper-input/paper-input.html">
+<link rel="import" href="../components/core-icon-button/core-icon-button.html">
 <link rel="import" href="string.html">
 <link rel="import" href="list.html">
 <link rel="import" href="value-picker.html">
@@ -9,7 +9,7 @@
 <link rel="import" href="index-reference.html">
 <link rel="import" href="map-item.html">
 
-<polymer-element name="collab-map" attributes="value">
+<polymer-element name="collab-map" attributes="value parent">
   <template>
     <style>
       .key {
@@ -57,9 +57,6 @@
         if(!this.isOpened){
           return;
         }
-        if(this.debug){
-          debugger;
-        }
         this.update();
       },
 
@@ -76,6 +73,7 @@
           item.key = keys[i];
           item.value = this.value.get(keys[i]);
           item.parent = this;
+          item.fileId = this.fileId;
           this.$.mapItems.appendChild(item);
         }
       },
@@ -99,7 +97,25 @@
       },
 
       toggleDebug: function () {
+        var that = this;
+        var fileId;
         this.debug = !this.debug;
+        this.globals.messenger.post({
+          type: 'debug',
+          status: this.debug,
+          fileId: this.fileId,
+          path: function () {
+            var current = that;
+            var path = '';
+            while(current.value.id != 'root'){
+              path = current.value.id + '-' + path;
+              current = current.parent;
+            }
+            fileId = current.parent.fileId;
+            return 'root' + '-' + path;
+          }(),
+          fileId: fileId
+        });
         this.shadowRoot.querySelector('.metadata').classList.toggle('debug-active');
       },
 

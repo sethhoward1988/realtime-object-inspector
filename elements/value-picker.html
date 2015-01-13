@@ -1,6 +1,6 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-shadow/paper-shadow.html">
-<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/paper-shadow/paper-shadow.html">
+<link rel="import" href="../components/paper-item/paper-item.html">
 
 <link rel="import" href="string.html">
 <link rel="import" href="list.html">
@@ -38,19 +38,27 @@
       ready: function () {},
 
       onMapClick: function () {
-        this.create('collaborative-map', this.$.globals.getModel().createMap());
+        this.create('collaborative-map', this.$.globals.getModel(this.getFileId()).createMap());
       },
 
       onListClick: function () {
-        this.create('collaborative-list', this.$.globals.getModel().createList());
+        this.create('collaborative-list', this.$.globals.getModel(this.getFileId()).createList());
       },
 
       onStringClick: function () {
-        this.create('collaborative-string', this.$.globals.getModel().createString());
+        this.create('collaborative-string', this.$.globals.getModel(this.getFileId()).createString());
       },
 
       onJsonValueClick: function () {
         this.create('json-value','');
+      },
+
+      getFileId: function () {
+        var child = this;;
+        while(child.parent){
+          child = child.parent;
+        }
+        return child.fileId;
       },
 
       create: function (type, value) {

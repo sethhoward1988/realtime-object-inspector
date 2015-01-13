@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 <link rel="import" href="doc.html">
 <link rel="import" href="app-globals.html">
 <link rel="import" href="app-settings.html">
@@ -19,6 +19,9 @@
       ready: function () {
         this.token = this.getParam('access_token');
         this.fileIds = this.getParam('ids');
+        if(!this.fileIds){
+          return;
+        }
         var serverHash = this.getServerUrl();
         var splitIds = this.fileIds.split(',');
         var that = this;

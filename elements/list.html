@@ -1,10 +1,10 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 <link rel="import" href="string.html">
 <link rel="import" href="map.html">
 <link rel="import" href="json.html">
 <link rel="import" href="list-item.html">
 
-<polymer-element name="collab-list" attributes="value">
+<polymer-element name="collab-list" attributes="value parent">
   <template>
     <style>
       .splitter {
@@ -75,6 +75,7 @@
           item.index = i;
           item.value = arr[i];
           item.parent = this;
+          item.fileId = this.fileId;
           item.ondragstart = this.onDragStart;
           item.ondragend = this.onDragEnd;
           item.ondragenter = this.onDragEnter;

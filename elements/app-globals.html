@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../components/polymer/polymer.html">
 
 <polymer-element name="app-globals">
   <script>
@@ -18,15 +18,30 @@
         return this.loadedDocs[fileId].doc;
       }
     }
+
+    MessagePoster = function () {};
+    MessagePoster.prototype = {
+      post: function (obj) {
+        if(!obj.type){
+          alert('Post man does not understand the message type');
+          return;
+        }
+
+        top.postMessage(obj, '*');
+      }
+    }
+
   </script>
   <script>
-  (function (d) {
+  (function (DocumentHolder, MessagePoster) {
 
-    var documentHolder = new d;
+    var documentHolder = new DocumentHolder;
+    var messenger = new MessagePoster;
 
     Polymer({
       ready: function () {
         this.documentHolder = documentHolder;
+        this.messenger = messenger;
       },
 
       addDoc: function (fileId, doc) {
@@ -42,6 +57,6 @@
       },
     });
 
-  })(DocumentHolder);
+  })(DocumentHolder, MessagePoster);
   </script>
 </polymer-element>

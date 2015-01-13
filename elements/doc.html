@@ -1,9 +1,9 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../core-ajax/core-ajax.html">
+<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-ajax/core-ajax.html">
 <link rel="import" href="map.html">
 <link rel="import" href="collaborator-display.html">
 
-<polymer-element name="collab-doc" attributes="doc fileId token title">
+<polymer-element name="collab-doc" attributes="doc fileId token">
   <template>
     <core-ajax
       id="driveFileMetadataRequest"
@@ -16,11 +16,11 @@
     <div class="metadata">
       <core-icon id="expandIcon" class="collapse" icon="expand-more" on-click="{{ toggleExpand }}"></core-icon>
       <span class="type color-primary">Collaborative Document</span>
-      <span class="color-tertiary">id="</span><span class="color-secondary">{{ fileId }}</span><span class="color-tertiary">" title="</span><span id="title" class="color-secondary"></span><span class="color-tertiary">"</span>
+      <span class="color-tertiary">id="</span><span class="color-secondary">{{ fileId }}</span><span class="color-tertiary">" title="</span><span id="title" class="color-secondary"></span><span class="color-tertiary">" readOnly="</span><span id="readOnly" class="color-secondary"></span><span class="color-tertiary">"</span>
     </div>
     <div id="content" hidden?="{{ contentHidden }}">
       <collaborator-display id="collaborators"></collaborator-display>
-      <collab-map id="mapEl"></collab-map>
+      <collab-map id="mapEl" fileId="{{ fileId }}"></collab-map>
     </div>
   </template>
   <script>
@@ -33,7 +33,9 @@
 
       docChanged: function () {
         this.$.mapEl.value = this.doc.getModel().getRoot();
+        this.$.mapEl.parent = this;
         this.$.collaborators.collaborators = this.doc.getCollaborators();
+        this.$.readOnly.textContent = this.doc.getModel().isReadOnly;
         this.doc.addEventListener(gapi.drive.realtime.EventType.COLLABORATOR_JOINED, this.onCollaboratorChanged);
         this.doc.addEventListener(gapi.drive.realtime.EventType.COLLABORATOR_LEFT, this.onCollaboratorChanged);
       },
@@ -47,7 +49,7 @@
       },
 
       handleResponse: function (evt, resp) {
-        this.$.title.innerText = resp.response.title;
+        this.$.title.textContent = resp.response.title;
       },
 
       toggleExpand: function () {
